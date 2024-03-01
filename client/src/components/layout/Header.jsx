@@ -1,8 +1,7 @@
-import React, { useState } from 'react'
+import React, { Suspense, lazy, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { Box, AppBar, Toolbar, Typography, IconButton, Tooltip } from '@mui/material'
+import { Box, AppBar, Toolbar, Typography, IconButton, Tooltip, Backdrop } from '@mui/material'
 import { orange } from '../styles/color'
-import SearchDialog from '../dialogs/SearchDialog'
 import MenuIcon from '@mui/icons-material/Menu';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import AddIcon from '@mui/icons-material/Add';
@@ -10,6 +9,10 @@ import GroupIcon from '@mui/icons-material/Group';
 import LogoutIcon from '@mui/icons-material/Logout';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+
+const SearchDialog = lazy(() => import('../dialogs/SearchDialog'));
+const Notification = lazy(() => import('../dialogs/Notification'));
+const NewGroup = lazy(() => import('../dialogs/NewGroup'));
 
 const Header = () => {
 
@@ -34,10 +37,9 @@ const Header = () => {
         setIsNotificationOpen(prev => !prev);
     }
 
-    const navigateToGroup = () => useNavigate('/groups');
-    const logoutHandler = () => {
-
-    }
+    const navigate = useNavigate();
+    const navigateToGroup = () => navigate('/groups');
+    const logoutHandler = () => { }
 
     return (
         <>
@@ -82,10 +84,20 @@ const Header = () => {
                 </AppBar>
             </Box>
 
-            {/* if Search is Open then Search Dialog will be opened */}
+            {/* if any below component is open then corresponding dialogbox will be open */}
             {
                 isSearch && (
-                    <SearchDialog />
+                    <Suspense fallback={<Backdrop open />}><SearchDialog /></Suspense>
+                )
+            }
+            {
+                isNotification && (
+                    <Suspense fallback={<Backdrop open />}><Notification /></Suspense>
+                )
+            }
+            {
+                isNewGroup && (
+                    <Suspense fallback={<Backdrop open />}><NewGroup /></Suspense>
                 )
             }
 

@@ -1,7 +1,8 @@
-import React, { lazy } from 'react'
+import React, { Suspense, lazy } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 import ProtectRoute from './components/auth/ProtectRoute';
+import LayoutLoader from './components/layout/Loaders';
 
 // importing dynamically whenever we need the component
 const Home = lazy(() => import('./pages/Home'));
@@ -15,19 +16,20 @@ let user = true;
 const App = () => {
   return (
     <BrowserRouter>
-      <Routes>
+      <Suspense fallback={<LayoutLoader />}>
+        <Routes>
+          {/* if user exist then only u can access below routes */}
+          <Route element={<ProtectRoute user={user} />}>
+            <Route path='/' element={<Home />} />
+            <Route path='/chat/:chatId' element={<Chat />} />
+            <Route path='/groups' element={<Groups />} />
+          </Route>
 
-        {/* if user exist then only u can access below routes */}
-        <Route element={<ProtectRoute user={user} />}>
-          <Route path='/' element={<Home />} />
-          <Route path='/chat' element={<Chat />} />
-          <Route path='/groups' element={<Groups />} />
-        </Route>
+          <Route path='/login' element={<ProtectRoute user={!user} redirect="/"><Login /></ProtectRoute>} />
 
-        <Route path='/login' element={<ProtectRoute user={!user} redirect="/"><Login /></ProtectRoute>} />
-
-        <Route path='*' element={<NotFound />}></Route>
-      </Routes>
+          <Route path='*' element={<NotFound />}></Route>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }
