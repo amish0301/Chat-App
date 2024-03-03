@@ -16,6 +16,13 @@ const AvatarCard = ({ avatar = [], max = 2, groupChat }) => {
                             }} />)
                         ))
                     }
+                    {
+                        avatar.length - max > 0 ? <Avatar key={Math.random() * 100} sx={{
+                            width: '3rem', height: '3rem', position: "absolute", left: {
+                                xs: `1rem`, sm: `1.5rem`,
+                            },
+                        }}>+{avatar.length - max}</Avatar> : null
+                    }
                 </Box>
             </AvatarGroup>
         </Stack>

@@ -6,7 +6,7 @@ export const samplechats = [
     name: "John Smith",
     _id: "1",
     groupChat: false,
-    members: ["1", "2"],
+    members: ["1"],
   },
   {
     avatar: [
@@ -16,7 +16,7 @@ export const samplechats = [
     name: "Methew Parker",
     _id: "2",
     groupChat: true,
-    members: ["1", "2", "3"],
+    members: ["2", "3"],
   },
   {
     avatar: [
@@ -25,6 +25,6 @@ export const samplechats = [
     name: "Han Lue",
     _id: "4",
     groupChat: false,
-    members: ["1", "2", "3", "4", "5"],
+    members: ["1", "5"],
   },
 ];

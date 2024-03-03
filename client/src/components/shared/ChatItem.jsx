@@ -18,7 +18,7 @@ const ChatItem = ({ avatar = [], name, _id, groupChat = false, sameSender, isOnl
       }}>
 
         {/* profile pic */}
-        <AvatarCard avatar={avatar} groupChat={groupChat}/>
+        <AvatarCard avatar={avatar} groupChat={groupChat} />
 
         <Stack>
           <Typography>{name}</Typography>
@@ -30,7 +30,7 @@ const ChatItem = ({ avatar = [], name, _id, groupChat = false, sameSender, isOnl
         </Stack>
 
         {
-          isOnline && <Box sx={{ width: '10px', height: '10px', borderRadius: '50%', position: 'absolute', top: '50%', right: '1rem', bgcolor: 'greenyellow', transform: 'translateY(-50%)' }} />
+          isOnline && <Box sx={{ width: '10px', height: '10px', borderRadius: '50%', position: 'absolute', top: '50%', right: '1rem', bgcolor: '#FFB302', transform: 'translateY(-50%)' }} />
         }
       </div>
     </Link>
