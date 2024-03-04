@@ -1,12 +1,43 @@
-import { Dialog, DialogTitle, Stack, TextField } from '@mui/material'
-import React from 'react'
+import React, { useState } from 'react'
+import { Dialog, DialogActions, DialogTitle, IconButton, InputAdornment, List, Stack, TextField } from '@mui/material'
+import { Search as SearchIcon, Close as CloseIcon } from '@mui/icons-material'
+import { useInputValidation } from '6pp'
+import UserItem from '../shared/UserItem'
+import { sampleUsers } from '../../utils/sampleData'
 
 const SearchDialog = () => {
+  // const users = [];
+  const search = useInputValidation("");
+  const [users, setUsers] = useState(sampleUsers);
+  const [isOpenDialog, setIsOpenDialog] = useState(true);
+  let isLoadingSendFriendRequest = false; // it should be in a state
+  const addFriendHandler = (id) => {
+
+  }
+  const closeDialog = () => setIsOpenDialog(prev => !prev);
+
   return (
-    <Dialog open>
+    <Dialog open={isOpenDialog}>
       <Stack p={'2rem'} width={'25rem'}>
-        <DialogTitle textAlign={'center'}>Find People</DialogTitle>
-        <TextField></TextField>
+        <Stack direction={'row'} sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+          <DialogTitle textAlign={'center'}>Find People</DialogTitle>
+          <IconButton size='medium' onClick={closeDialog}>
+            <CloseIcon />
+          </IconButton>
+        </Stack>
+        
+        <TextField value={search.value} onChange={search.changeHandler} variant='outlined' size='small' InputProps={{
+          startAdornment: (<InputAdornment position='start'><SearchIcon /></InputAdornment>),
+        }} />
+
+        {/* Search results */}
+        <List>
+          {
+            users.map((user) => (
+              <UserItem user={user} key={user._id} handler={addFriendHandler} handlerIsLoading={isLoadingSendFriendRequest} />
+            ))
+          }
+        </List>
       </Stack>
     </Dialog>
   )
