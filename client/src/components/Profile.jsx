@@ -7,7 +7,7 @@ const ProfileCard = ({ text, Icon, heading }) => (
     <Stack direction={'row'} alignItems={'center'} spacing={'2rem'} color={'white'} textAlign={'center'} >
         {Icon && Icon}
         <Stack spacing={'0.5rem'}>
-            <Typography variant='caption' color={'gray'} align='left'>{heading}</Typography>
+            <Typography variant='body2' color={'black'} align='left'>{heading}</Typography>
             <Typography variant='subtitle2' >{text}</Typography>
         </Stack>
     </Stack>

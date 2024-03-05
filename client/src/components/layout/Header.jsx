@@ -71,7 +71,7 @@ const Header = () => {
                             </Tooltip>
                             <Tooltip title={"Notifications"}>
                                 <IconButton color='inherit' size='large' onClick={openNotification}>
-                                    {isNotificationOpen ? <NotificationsIcon /> : <NotificationsNoneIcon />}
+                                    {isNotificationOpen  ? <NotificationsIcon /> : <NotificationsNoneIcon />}
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title={"Logout"}>
