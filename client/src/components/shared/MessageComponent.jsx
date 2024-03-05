@@ -6,27 +6,27 @@ import { fileFormat } from '../../lib/feature'
 import RenderAttachment from './RenderAttachment';
 
 const MessageComponent = ({ message, user }) => {
-  const { sender, content, attachments = [], createdAt } = message;
+  const { sender, content, attachments = [] , createdAt } = message;
   const sameSender = sender?._id === user._id;
   const timeAgo = moment(createdAt).fromNow();
 
   return (
-    <div style={{ alignSelf: sameSender ? 'flex-end' : 'flex-start', backgroundColor: 'white', color: "black", borderRadius: '5px', padding: '0.5rem', width: 'fit-content' }}>
+    <div style={{ alignSelf: sameSender ? 'flex-end' : 'flex-start', backgroundColor: 'white', color: "black", borderRadius: '5px', padding: '.5rem', width: 'fit-content' }}>
 
       {!sameSender && <Typography variant='caption' color={lightBlue} fontWeight={'600'}>{sender.name}</Typography>}
 
       {content && <Typography>{content}</Typography>}
 
-      {/* Attachment */}
+      {/* Attachments */}
       {
-        attachments.length > 0 && (
+        attachments?.length > 0 && (
           attachments.map((attachment, index) => {
             const url = attachment.url;
             const file = fileFormat(url);
 
             return (
               <Box key={index}>
-                <a href="" target='_blank' download style={{ color: 'black' }}>
+                <a href={url} target='_blank' download style={{color: 'black',}}>
                   {
                     RenderAttachment(file,url)
                   }
@@ -37,7 +37,7 @@ const MessageComponent = ({ message, user }) => {
         )
       }
 
-      <Typography variant='caption' color={'text.secondary'} textAlign='right'>
+      <Typography variant='caption' color={'text.secondary'} textAlign={'right'} >
         {timeAgo}
       </Typography>
     </div>

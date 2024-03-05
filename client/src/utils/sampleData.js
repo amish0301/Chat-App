@@ -100,14 +100,8 @@ export const sampleNotifications = [
 // FOR SAMPLE MESSAGES
 export const sampleMessage = [
   {
-    attachment: [
-      {
-        public_id: "adadada",
-        url: "https://png.pngtree.com/png-vector/20220709/ourmid/pngtree-businessman-user-avatar-wearing-suit-with-red-tie-png-image_5809521.png",
-      },
-    ],
     content: "Hey Amish, How you doing?",
-    _id: "1st",
+    _id: "1",
     sender: {
       _id: "user._id",
       name: "John Smith",
@@ -116,17 +110,17 @@ export const sampleMessage = [
     createdAt: "2024-02-12T10:41:30.630Z",
   },
   {
-    attachment: [
+    attachments: [
       {
-        public_id: "adadada",
+        public_id: "dasdaddad",
         url: "https://png.pngtree.com/png-vector/20220709/ourmid/pngtree-businessman-user-avatar-wearing-suit-with-red-tie-png-image_5809521.png",
       },
     ],
-    content: "I'm doing good what about you?",
-    _id: "2nd",
+    content: "",
+    _id: "2",
     sender: {
       _id: "dasdad",
-      name: "sender-name 2",
+      name: "Amish Pithva",
     },
     chat: "chatId",
     createdAt: "2024-02-12T12:41:30.630Z",
