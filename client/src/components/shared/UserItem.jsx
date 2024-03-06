@@ -2,12 +2,14 @@ import React, { memo } from 'react'
 import { Avatar, IconButton, ListItem, Stack, Typography } from '@mui/material';
 import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material'
 
-const UserItem = ({ user, handler, handlerIsLoading }) => {
-    const { name, _id, avatar, isAdded } = user;
+const UserItem = ({ user, handler, handlerIsLoading, isAdded }) => {
+    const { name, _id, avatar } = user;
     return (
         <ListItem>
-            <Stack direction={'row'} spacing={'1rem'} alignItems={'center'} width={'100%'}>
-                <Avatar />
+            <Stack direction={'row'} spacing={'1rem'} alignItems={'center'} width={'100%'} sx={{ boxShadow: '0 0 0.5rem rgba(0,0,0,0.2)',
+                      padding: '1rem 1rem',
+                      borderRadius: '1rem',}}>
+                <Avatar src={avatar[0]} />
 
                 <Typography variant='body1' sx={{ flexGrow: 1, display: '-webkit-flex', WebkitLineClamp: 1, WebkitFlexDirection: 'column', textOverflow: 'ellipsis' }} >{name}</Typography>
 

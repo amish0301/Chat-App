@@ -4,8 +4,8 @@ import {transformImage} from '../../lib/feature'
 
 const AvatarCard = ({ avatar = [], max = 2, groupChat }) => {
     return (
-        <Stack direction={'row'} spacing={1}>
-            <AvatarGroup >
+        <Stack direction={'row'} spacing={1} >
+            <AvatarGroup sx={{position: 'relative'}}>
                 <Box width={'5rem'} height={'3rem'}>
                     {
                         avatar?.map((src, index) => (

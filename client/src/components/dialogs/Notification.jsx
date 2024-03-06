@@ -1,7 +1,7 @@
 import React, { memo, useState } from 'react'
 import { Avatar, Button, Dialog, DialogTitle, IconButton, List, ListItem, Stack, Typography } from '@mui/material'
 import { sampleNotifications } from '../../utils/sampleData';
-import { Close as CloseIcon } from '@mui/icons-material'
+import { Close as CloseIcon, Done as DoneIcon, Close as CancelIcon } from '@mui/icons-material'
 
 
 const NotifiacationItem = memo(({ sender, _id, handler }) => {
@@ -9,15 +9,19 @@ const NotifiacationItem = memo(({ sender, _id, handler }) => {
 
   return (
     <ListItem>
-      <Stack direction={'row'} spacing={'1rem'} alignItems={'center'} width={'100%'}>
+      <Stack direction={'row'} spacing={'1rem'} alignItems={'center'} width={'100%'} >
         <Avatar src={avatar} />
 
-        <Typography variant='body1' sx={{ flexGrow: 1, display: '-webkit-box', WebkitLineClamp: 1,
-        WebkitBoxOrient: 'vertical', overflow: 'hidden' ,textOverflow: 'ellipsis', width: '100%' }}>{`${name} sent you a friend Request.`}</Typography>
+        <Typography variant='body1' sx={{
+          flexGrow: 1, display: '-webkit-box', WebkitLineClamp: 1,
+          WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%'
+        }}>
+          {`${name} sent you a Friend request.`}
+        </Typography>
 
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={'.5rem'}>
-          <Button sx={{ fontWeight: "bolder" }} onClick={() => handler({ _id, accept: true })}>Accept</Button>
-          <Button color='error' sx={{ fontWeight: "bolder" }} onClick={() => handler({ _id, accept: false })}>Reject</Button>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: '0', sm: '0.5rem' }}>
+          <Button sx={{ fontWeight: "bolder" }} onClick={() => handler({ _id, accept: true })}><DoneIcon /></Button>
+          <Button color='error' sx={{ fontWeight: "bolder" }} onClick={() => handler({ _id, accept: false })}><CancelIcon /></Button>
         </Stack>
       </Stack>
     </ListItem>

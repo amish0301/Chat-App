@@ -18,7 +18,7 @@ const SearchDialog = () => {
 
   return (
     <Dialog open={isOpenDialog}>
-      <Stack p={'2rem'} width={'25rem'}>
+      <Stack p={'2rem'} maxWidth={'25rem'}>
         <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <DialogTitle textAlign={'center'}>Find People</DialogTitle>
           <IconButton size='medium' onClick={closeDialog}>

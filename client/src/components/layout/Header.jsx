@@ -39,14 +39,17 @@ const Header = () => {
 
     const navigate = useNavigate();
     const navigateToGroup = () => navigate('/groups');
-    const logoutHandler = () => { }
+    const navigateToHome = () => navigate('/');
+    const logoutHandler = () => { 
+        
+    }
 
     return (
         <>
             <Box sx={{ flexGrow: 1 }} height={'4rem'}>
                 <AppBar position='static' sx={{ bgcolor: orange }} >
                     <Toolbar>
-                        <Typography variant='h6' sx={{ display: { xs: 'none', sm: 'block' }, cursor: 'pointer' }}>Talk-A-Tive</Typography>
+                        <Typography variant='h6' sx={{ display: { xs: 'none', sm: 'block' }, cursor: 'pointer'}} onClick={navigateToHome}>Talk-A-Tive</Typography>
                         <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
                             <IconButton color='inherit' onClick={handleMobile}>
                                 <MenuIcon />

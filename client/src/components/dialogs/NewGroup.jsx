@@ -13,8 +13,6 @@ const NewGroup = () => {
   const groupName = useInputValidation("");
 
   const selectMemberHandler = (id) => {
-    setMembers(prev => prev.map(user => user._id === id ? { ...user, isAdded: !user.isAdded } : user ));
-
     setSelectedMembers((prev) =>
       prev.includes(id) ? prev.filter((currId) => currId !== id) : [...prev, id]
     );
@@ -29,7 +27,7 @@ const NewGroup = () => {
 
   return (
     <Dialog open={isOpen} onClose={closeHandler}>
-      <Stack p={{ xs: '1rem', sm: '3rem' }} width={'25rem'} spacing={'1rem'}>
+      <Stack p={{ xs: '1rem', sm: '3rem' }} maxWidth={'25rem'} spacing={'1rem'}>
         <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'}>
           <DialogTitle variant='h5'>New Group</DialogTitle>
           <IconButton size='medium' onClick={closeDialog}>
@@ -46,7 +44,7 @@ const NewGroup = () => {
           <List sx={{ maxHeight: '15rem', overflow: 'auto' }}>
             {
               members.map((user) => (
-                <UserItem user={user} key={user._id} handler={selectMemberHandler} />
+                <UserItem user={user} key={user._id} handler={selectMemberHandler} isAdded={selectedMembers.includes(user._id)}/>
               ))
             }
           </List>
