@@ -17,6 +17,8 @@ const AvatarCard = ({ avatar = [], max = 2, groupChat }) => {
                             }} />)
                         ))
                     }
+
+                    {/* if there are more than max limit avatar we just simply shows count of avatar */}
                     {
                         avatar.length - max > 0 ? <Avatar key={Math.random() * 100} sx={{
                             width: '3rem', height: '3rem', position: "absolute", left: {

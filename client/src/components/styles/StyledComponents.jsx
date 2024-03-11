@@ -48,7 +48,7 @@ export const SearchField = styled('input')(
 
 export const CurveButton = styled('button')(
     `border-radius: 1.5rem;
-    padding: .5rem 1.4rem;
+    padding: 0.5rem 2.5rem;
     align-items: center;
     border: none;
     outline: none;

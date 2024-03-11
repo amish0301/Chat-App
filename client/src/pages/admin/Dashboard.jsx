@@ -56,16 +56,16 @@ const Dashboard = () => {
       <Container component={'main'}>
         {Appbar}
 
-        <Stack direction={{ xs: 'column', lg: 'row' }} spacing={{ xs: '1rem', sm: '2rem' }} alignItems={{ xs: 'center', lg: 'stretch' }} flexWrap={'wrap'} justifyContent={{ xs: 'center', lg: 'space-between' }}>
-          <Paper elevation={3} sx={{ padding: '2rem 3.5rem', borderRadius: '1rem', width: '100%', maxWidth: '40rem' }}>
+        <Stack direction={{ xs: 'column', lg: 'row' }} sx={{gap: '2rem'}} alignItems={{ xs: 'center', lg: 'stretch' }} flexWrap={'wrap'} justifyContent={{ xs: 'center', lg: 'space-between' }}>
+          <Paper elevation={3} sx={{ padding: '2rem 3.5rem', borderRadius: '1rem', width: '100%', maxWidth: '40rem', bgcolor: 'rgba(0,0,0,0.03)' }}>
             <Typography variant='h5' sx={{ marginBottom: '1.5rem' }}>Last Messages</Typography>
             {<LineChart value={[23, 56, 34, 21, 89, 1]} />}
           </Paper>
 
-          <Paper elevation={3} sx={{ padding: '1rem', borderRadius: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', width: { xs: '100%', sm: '50%' }, maxWidth: '25rem' }}>
+          <Paper elevation={3} sx={{ padding: '1rem', borderRadius: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', maxWidth: '25rem', bgcolor: 'rgba(0,0,0,0.03)' }}>
             {<DoughnutChart labels={['Total Chats', 'Group Chats']} value={[20, 50]} />}
 
-            <Stack position={'absolute'} direction={'row'} justifyContent={'center'} alignItems={'center'} spacing={'0.5rem'} width={'100%'} height={'100%'}>
+            <Stack position={'absolute'} direction={'row'} justifyContent={'center'} alignItems={'center'} spacing={'0.5rem'} height={'100%'}>
               <GroupIcon />
               <Typography>Vs</Typography>
               <PersonIcon />
