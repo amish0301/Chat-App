@@ -5,6 +5,8 @@ const {
   deleteUser,
   login,
   getMyProfile,
+  logout,
+  searchUser,
 } = require("../controllers/user");
 const { singleAvatar } = require("../middlewares/multer");
 const { isAuthenticated } = require("../middlewares/auth");
@@ -12,7 +14,12 @@ const { isAuthenticated } = require("../middlewares/auth");
 router.post("/signup", singleAvatar, newUser);
 router.post("/login", login);
 
-router.get("/me", isAuthenticated, getMyProfile);
+// middleware
+router.use(isAuthenticated);
+
+router.get("/me", getMyProfile);
+router.get("/logout", logout);
+router.get('/search', searchUser); 
 // router.post("/:id", deleteUser);
 
 module.exports = router;

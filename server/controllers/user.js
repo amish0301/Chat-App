@@ -1,6 +1,7 @@
 const { User } = require("../models/user");
 const { sendToken } = require("../utils/JWT");
 const { compare } = require("bcrypt");
+const { cookieOptions } = require("../constants/cookie");
 const { ErrorHandler } = require("../utils/ErrorHandler");
 
 // SIGN-UP
@@ -43,6 +44,26 @@ const login = async (req, res, next) => {
   }
 };
 
+// LOG-OUT
+const logout = async (req, res) => {
+  return res
+    .status(200)
+    .cookie("uid", "", { ...cookieOptions, maxAge: 0 })
+    .json({ success: true, message: "Logged Out Successfully" });
+};
+
+// Search - User
+const searchUser = async (req, res) => {
+  try {
+    const { name } = req.query;
+
+    return res.status(200).json({ success: true, message: name });
+  } catch (error) {
+    // next(error);
+    cosonsole.log(error);
+  }
+};
+
 const getMyProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.userId);
@@ -67,7 +88,9 @@ const deleteUser = async (req, res) => {
 
 module.exports = {
   newUser,
-  deleteUser,
   login,
+  logout,
+  searchUser,
   getMyProfile,
+  deleteUser,
 };

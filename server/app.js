@@ -1,9 +1,11 @@
 const express = require("express");
-const userRoutes = require("./routes/user");
 const cookieParser = require("cookie-parser");
 const { connectMongoDB } = require("./utils/connection");
 const { errorHandler } = require("./middlewares/error");
 require("dotenv").config({ path: "./.env" });
+
+const userRoutes = require("./routes/user");
+const chatRoutes = require("./routes/chat");
 
 // Initialisations
 const mongouri = process.env.MONGODB_URL;
@@ -18,6 +20,7 @@ app.use(cookieParser());
 
 // Routes
 app.use("/user", userRoutes);
+app.use("/chat", chatRoutes);
 
 app.use(errorHandler); // Middleware to handle errors
 // default Home Route
