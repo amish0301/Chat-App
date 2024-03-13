@@ -19,7 +19,7 @@ const newGroupChat = TryCatch(async (req, res, next) => {
   });
 
   emitEvent(req, ALERT, allMembers, `Welcome to ${name} group`);
-  emitEvent(req, REFETCH_CHAT, memebers);
+  emitEvent(req, REFETCH_CHAT, members);
 
   return res.status(201).json({
     success: true,
