@@ -5,11 +5,14 @@ const {
   newGroupChat,
   getMyChats,
   getMyGroups,
+  addMembers,
 } = require("../controllers/chat");
 
 router.use(isAuthenticated);
-// router.
+
 router.post("/new", newGroupChat);
+router.put("/add", addMembers);
+
 router.get("/my", getMyChats);
 router.get("/my/groups", getMyGroups);
 module.exports = router;
