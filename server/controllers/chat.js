@@ -12,7 +12,7 @@ const newGroupChat = TryCatch(async (req, res, next) => {
     return next(new ErrorHandler("Minimum 2 members are required", 400));
   }
 
-  const allMembers = [...members, req.userId]; // add yourself into group
+  const allMembers = [...members.filter((member) => member !== req.userId), req.userId]; // add yourself into group
   await Chat.create({
     name,
     groupChat: true,
@@ -96,7 +96,10 @@ const addMembers = TryCatch(async (req, res, next) => {
   );
 
   const allNewMembers = await Promise.all(allNewMembersPromise);
-  chat.members.push(...allNewMembers.map((member) => member._id));
+
+  // unique members validation
+  const uniqueMembers = allNewMembers.filter((member) => !chat.members.includes(member._id));
+  chat.members.push(...uniqueMembers.map((member) => member._id));
 
   if (chat.members.length > 100) {
     return next(new ErrorHandler("Can't add more than 100 members", 400));
@@ -113,7 +116,7 @@ const addMembers = TryCatch(async (req, res, next) => {
   );
   emitEvent(req, REFETCH_CHAT, chat.members);
 
-  return res.status(200).json({ success: true, message: `Members Added in ${chat.name}` });
+  return res.status(200).json({ success: true, message: `Members are Added in ${chat.name}` });
 });
 
 module.exports = { newGroupChat, getMyChats, getMyGroups, addMembers };
