@@ -12,7 +12,10 @@ const newGroupChat = TryCatch(async (req, res, next) => {
     return next(new ErrorHandler("Minimum 2 members are required", 400));
   }
 
-  const allMembers = [...members.filter((member) => member !== req.userId), req.userId]; // add yourself into group
+  const allMembers = [
+    ...members.filter((member) => member !== req.userId),
+    req.userId,
+  ]; // add yourself into group
   await Chat.create({
     name,
     groupChat: true,
@@ -84,21 +87,22 @@ const addMembers = TryCatch(async (req, res, next) => {
   if (!chat) return next(new ErrorHandler("Chat not found", 404));
   if (!chat.groupChat)
     return next(new ErrorHandler("Only group chat can have members", 400));
-  if (!members || members.length < 1) return next(new ErrorHandler("Please Provide Members", 400));
+  if (!members || members.length < 1)
+    return next(new ErrorHandler("Please Provide Members", 400));
 
   // if user is tries to add members in a group, where he/she is not creator of the group then they can't add members
   if (chat.creator.toString() !== req.userId.toString()) {
     return next(new ErrorHandler("You are not authorized to add members", 403));
   }
 
-  const allNewMembersPromise = members.map((member) =>
-    User.findById(member)
-  );
+  const allNewMembersPromise = members.map((member) => User.findById(member));
 
   const allNewMembers = await Promise.all(allNewMembersPromise);
 
   // unique members validation
-  const uniqueMembers = allNewMembers.filter((member) => !chat.members.includes(member._id));
+  const uniqueMembers = allNewMembers.filter(
+    (member) => !chat.members.includes(member._id)
+  );
   chat.members.push(...uniqueMembers.map((member) => member._id));
 
   if (chat.members.length > 100) {
@@ -116,7 +120,84 @@ const addMembers = TryCatch(async (req, res, next) => {
   );
   emitEvent(req, REFETCH_CHAT, chat.members);
 
-  return res.status(200).json({ success: true, message: `Members are Added in ${chat.name}` });
+  return res
+    .status(200)
+    .json({ success: true, message: `Members are Added in ${chat.name}` });
 });
 
-module.exports = { newGroupChat, getMyChats, getMyGroups, addMembers };
+const removeMembers = TryCatch(async (req, res, next) => {
+  const { chatId, userId } = req.body;
+
+  const [chat, userThatwillBeRemoved] = await Promise.all([
+    Chat.findById(chatId),
+    User.findById(userId, "name"),
+  ]);
+
+  if (!chat) return next(new ErrorHandler("Chat not found", 404));
+  if (!chat.groupChat)
+    return next(new ErrorHandler("This is not a group chat", 400));
+  if (chat.creator.toString() !== req.userId.toString()) {
+    return next(
+      new ErrorHandler("You are not authorized to remove members", 403)
+    );
+  }
+
+  if (chat.members.length < 3) {
+    return next(new ErrorHandler("Group must have atleast 2 members", 400));
+  }
+
+  chat.members = chat.members.filter(
+    (member) => member.toString() !== userId.toString()
+  );
+
+  await chat.save();
+  emitEvent(
+    req,
+    ALERT,
+    chat.members,
+    `${userThatwillBeRemoved.name} has been removed from the group`
+  );
+
+  return res.status(200).json({ success: true, message: "Member Removed" });
+});
+
+const leaveGroup = TryCatch(async (req, res, next) => {
+  const chatId = req.params.id;
+  const chat = await Chat.findById(chatId);
+
+  if (!chat) return next(new ErrorHandler("Chat not found", 404));
+
+  if (!chat.groupChat)
+    return next(new ErrorHandler("This is not a group chat", 400));
+
+  const remainingMembers = chat.members.filter(
+    (member) => member.toString() !== req.userId.toString()
+  );
+
+  // if Group admin itself want to leave group
+  if (chat.creator.toString() === req.userId.toString()) {
+    const randomElement = Math.floor(Math.random() * remainingMembers.length);
+    const newCreator = remainingMembers[randomElement];
+    chat.creator = newCreator;
+  }
+
+  chat.members = remainingMembers;
+  const [user] = await Promise.all([
+    User.findById(req.userId),
+    chat.save(),
+  ])
+
+  emitEvent(req, ALERT, remainingMembers, `${user.name} has left the group`);
+  return res
+    .status(200)
+    .json({ success: true, message: "You left the Group Successfully" });
+});
+
+module.exports = {
+  newGroupChat,
+  getMyChats,
+  getMyGroups,
+  addMembers,
+  removeMembers,
+  leaveGroup,
+};
