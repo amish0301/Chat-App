@@ -7,15 +7,20 @@ const {
   getMyGroups,
   addMembers,
   removeMembers,
-  leaveGroup
+  leaveGroup,
+  sendAttachments
 } = require("../controllers/chat");
+const { attachmentsMulter } = require("../middlewares/multer");
 
 router.use(isAuthenticated);
 
 router.post("/new", newGroupChat);
-router.put("/addmember", addMembers);
-router.put('/removemember', removeMembers);
+router.put("/add", addMembers);
+router.put('/remove', removeMembers);
 router.delete("/leave/:id", leaveGroup);
+
+// Send Attachments
+router.post('/message', attachmentsMulter, sendAttachments);
 
 
 // fetching info of user

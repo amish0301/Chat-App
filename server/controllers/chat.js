@@ -1,9 +1,15 @@
 const { TryCatch, ErrorHandler } = require("../utils/ErrorHandler");
 const { Chat } = require("../models/chat");
 const { User } = require("../models/user");
+const { Message } = require("../models/message");
 const { getOtherMember } = require("../lib/helper");
 const { emitEvent } = require("../utils/feature");
-const { ALERT, REFETCH_CHAT } = require("../constants/events");
+const {
+  ALERT,
+  REFETCH_CHAT,
+  NEW_MESSAGE_ALERT,
+} = require("../constants/events");
+const { attachmentsMulter } = require("../middlewares/multer");
 
 const newGroupChat = TryCatch(async (req, res, next) => {
   const { name, members } = req.body;
@@ -136,7 +142,8 @@ const removeMembers = TryCatch(async (req, res, next) => {
   if (!chat) return next(new ErrorHandler("Chat not found", 404));
   if (!chat.groupChat)
     return next(new ErrorHandler("This is not a group chat", 400));
-  if (chat.creator.toString() !== req.userId.toString()) {
+
+  if (chat.creator.toString() !== userId.toString()) {
     return next(
       new ErrorHandler("You are not authorized to remove members", 403)
     );
@@ -174,6 +181,10 @@ const leaveGroup = TryCatch(async (req, res, next) => {
     (member) => member.toString() !== req.userId.toString()
   );
 
+  if (remainingMembers.length < 3) {
+    return next(new ErrorHandler("Group must have atleast 2 members", 400));
+  }
+
   // if Group admin itself want to leave group
   if (chat.creator.toString() === req.userId.toString()) {
     const randomElement = Math.floor(Math.random() * remainingMembers.length);
@@ -182,15 +193,54 @@ const leaveGroup = TryCatch(async (req, res, next) => {
   }
 
   chat.members = remainingMembers;
-  const [user] = await Promise.all([
-    User.findById(req.userId),
-    chat.save(),
-  ])
+  const [user] = await Promise.all([User.findById(req.userId), chat.save()]);
 
   emitEvent(req, ALERT, remainingMembers, `${user.name} has left the group`);
   return res
     .status(200)
     .json({ success: true, message: "You left the Group Successfully" });
+});
+
+const sendAttachments = TryCatch(async (req, res, next) => {
+  const { chatId } = req.body;
+  const [chat, sender] = await Promise.all([
+    Chat.findById(chatId),
+    User.findById(req.userId, "name"),
+  ]);
+
+  if (!chat) return next(new ErrorHandler("Chat not found", 404));
+
+  const files = req.files || [];
+
+  if (files.length < 1) return next(new ErrorHandler("No file Choosen", 400));
+
+  // Upload files here
+  const attachments = [];
+
+  const messageForDB = {
+    content: "",
+    attachments,
+    sender: sender._id,
+    chat: chatId,
+  };
+
+  const messageForRealTime = {
+    ...messageForDB,
+    sender: {
+      _id: sender._id,
+      name: sender.name,
+    },
+  };
+
+  const message = await Message.create(messageForDB);
+
+  emitEvent(req, NEW_ATTACHMENT, chat.members, {
+    message: messageForRealTime,
+    chatId,
+  });
+  emitEvent(req, NEW_MESSAGE_ALERT, chat.members, { chatId });
+
+  return res.status(200).json({ success: true, message });
 });
 
 module.exports = {
@@ -200,4 +250,5 @@ module.exports = {
   addMembers,
   removeMembers,
   leaveGroup,
+  sendAttachments,
 };
