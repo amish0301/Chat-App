@@ -8,7 +8,10 @@ const {
   addMembers,
   removeMembers,
   leaveGroup,
-  sendAttachments
+  sendAttachments,
+  getChatDetails,
+  renameGroup,
+  deleteGroup
 } = require("../controllers/chat");
 const { attachmentsMulter } = require("../middlewares/multer");
 
@@ -22,8 +25,13 @@ router.delete("/leave/:id", leaveGroup);
 // Send Attachments
 router.post('/message', attachmentsMulter, sendAttachments);
 
+// Get messages
+router.route('/:id').get(getChatDetails).put(renameGroup).delete(deleteGroup);
 
-// fetching info of user
+
+// fetching Personal info of user
 router.get("/my", getMyChats);
 router.get("/my/groups", getMyGroups);
+
+
 module.exports = router;
