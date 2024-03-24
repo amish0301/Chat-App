@@ -11,7 +11,8 @@ const {
   sendAttachments,
   getChatDetails,
   renameGroup,
-  deleteGroup
+  deleteChat,
+  getMessages
 } = require("../controllers/chat");
 const { attachmentsMulter } = require("../middlewares/multer");
 
@@ -26,7 +27,10 @@ router.delete("/leave/:id", leaveGroup);
 router.post('/message', attachmentsMulter, sendAttachments);
 
 // Get messages
-router.route('/:id').get(getChatDetails).put(renameGroup).delete(deleteGroup);
+router.get('/message/:id', getMessages);
+
+// Get chat Details and Manipulate with chat
+router.route('/:id').get(getChatDetails).put(renameGroup).delete(deleteChat);
 
 
 // fetching Personal info of user

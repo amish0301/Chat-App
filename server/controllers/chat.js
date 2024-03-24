@@ -3,7 +3,7 @@ const { Chat } = require("../models/chat");
 const { User } = require("../models/user");
 const { Message } = require("../models/message");
 const { getOtherMember } = require("../lib/helper");
-const { emitEvent } = require("../utils/feature");
+const { emitEvent, deleteFilesFromCloudnary } = require("../utils/feature");
 const {
   ALERT,
   REFETCH_CHAT,
@@ -287,8 +287,8 @@ const renameGroup = TryCatch(async (req, res, next) => {
   return res.status(200).json({ success: true, message: "Group Renamed" });
 });
 
-const deleteGroup = TryCatch(async (req, res, next) => {
-  const chatId = req.params.id;
+const deleteChat = TryCatch(async (req, res, next) => {
+  const { chatId } = req.params.id;
   const chat = Chat.findById(chatId);
 
   if (!chat) return next(new ErrorHandler("Chat not found", 404));
@@ -319,7 +319,39 @@ const deleteGroup = TryCatch(async (req, res, next) => {
     });
   });
 
-  await Promise.all([deleteFilesFromCloudnary(public_ids)]);
+  await Promise.all([
+    deleteFilesFromCloudnary(public_ids),
+    chat.deleteOne(),
+    Message.deleteMany({ chat: chatId }),
+  ]);
+
+  emitEvent(req, REFETCH_CHAT, chat.members);
+
+  return res
+    .status(200)
+    .json({ success: true, message: "Chat Deleted Successfully" });
+});
+
+const getMessages = TryCatch(async (req, res, next) => {
+  const { chatId } = req.params.id;
+  const { page = 1 } = req.query;
+
+  const limit = 20;
+  const skip = (page - 1) * limit;
+
+  const [messages, totalMessagesCount] = await Promise.all([
+    Message.find({ chat: chatId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("sender", "name")
+      .lean(),
+    Message.countDocuments({ chat: chatId }),
+  ]);
+
+  const totalPages = Math.ceil(totalMessagesCount / limit);
+
+  return res.status(200).json({ success: true, message: messages.reverse() });
 });
 
 module.exports = {
@@ -332,5 +364,6 @@ module.exports = {
   sendAttachments,
   getChatDetails,
   renameGroup,
-  deleteGroup,
+  deleteChat,
+  getMessages,
 };
