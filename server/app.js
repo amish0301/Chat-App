@@ -2,7 +2,7 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const { connectMongoDB } = require("./utils/connection");
 const { errorHandler } = require("./middlewares/error");
-// const {createUser} = require("./Fake_Data/user");
+// const { createMessagesInChat } = require("./Fake_Data/chat");
 require("dotenv").config({ path: "./.env" });
 
 const userRoutes = require("./routes/user");
@@ -10,10 +10,10 @@ const chatRoutes = require("./routes/chat");
 
 // Initialisations
 const mongouri = process.env.MONGODB_URL;
-const port = process.env.SERVER_PORT || 3000;
+const port = process.env.SERVER_PORT || 4000;
 
 connectMongoDB(mongouri);
-// createUser(10);
+// createMessagesInChat("66014e5bfc199f8316dce54c", 5);
 const app = express();
 
 // Middlewares

@@ -32,7 +32,6 @@ router.get('/message/:id', getMessages);
 // Get chat Details and Manipulate with chat
 router.route('/:id').get(getChatDetails).put(renameGroup).delete(deleteChat);
 
-
 // fetching Personal info of user
 router.get("/my", getMyChats);
 router.get("/my/groups", getMyGroups);
