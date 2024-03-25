@@ -23,14 +23,17 @@ router.post(
   validateHandler,
   newUser
 );
+
 router.post("/login", loginValidator(), validateHandler, login);
 
 // middleware
 router.use(isAuthenticated);
 
-router.get("/me", getMyProfile);
-router.get("/logout", logout);
 router.get("/search", searchUser);
+router.get("/logout", logout);
 // router.post("/:id", deleteUser);
+
+// personal info routes
+router.get("/me", getMyProfile);
 
 module.exports = router;

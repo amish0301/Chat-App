@@ -14,10 +14,6 @@ const { attachmentsMulter } = require("../middlewares/multer");
 const newGroupChat = TryCatch(async (req, res, next) => {
   const { name, members } = req.body;
 
-  if (members.length < 2) {
-    return next(new ErrorHandler("Minimum 2 members are required", 400));
-  }
-
   const allMembers = [
     ...members.filter((member) => member !== req.userId),
     req.userId,
@@ -288,8 +284,8 @@ const renameGroup = TryCatch(async (req, res, next) => {
 });
 
 const deleteChat = TryCatch(async (req, res, next) => {
-  const { chatId } = req.params.id;
-  const chat = Chat.findById(chatId);
+  const chatId = req.params.id;
+  const chat = await Chat.findById(chatId);
 
   if (!chat) return next(new ErrorHandler("Chat not found", 404));
 
@@ -350,7 +346,11 @@ const getMessages = TryCatch(async (req, res, next) => {
   ]);
   const totalPages = Math.ceil(totalMessagesCount / resPerPage) || 0;
 
-  return res.status(200).json({ success: true, messages: messages.reverse(), totalPages: totalPages });
+  return res.status(200).json({
+    success: true,
+    messages: messages.reverse(),
+    totalPages: totalPages,
+  });
 });
 
 module.exports = {

@@ -2,10 +2,11 @@ const { User } = require("../models/user");
 const { sendToken } = require("../utils/JWT");
 const { compare } = require("bcrypt");
 const { cookieOptions } = require("../constants/cookie");
-const { ErrorHandler } = require("../utils/ErrorHandler");
+const { ErrorHandler, TryCatch } = require("../utils/ErrorHandler");
+const { Chat } = require("../models/chat");
 
 // SIGN-UP
-const newUser = async (req, res) => {
+const newUser = TryCatch(async (req, res, next) => {
   const { name, username, password, bio } = req.body;
   const avatar = {
     public_id: "sample",
@@ -21,28 +22,24 @@ const newUser = async (req, res) => {
   });
 
   sendToken(res, user, 201, "User Created Successfully");
-};
+});
 
 // LOG-IN
-const login = async (req, res, next) => {
-  try {
-    const { username, password } = req.body;
+const login = TryCatch(async (req, res, next) => {
+  const { username, password } = req.body;
 
-    const user = await User.findOne({ username }).select("+password");
-    if (!user) {
-      return next(new ErrorHandler("Invalid Username or Password", 404));
-    }
-
-    const isMatchPassword = await compare(password, user.password);
-    if (!isMatchPassword) {
-      return next(new ErrorHandler("Invalid Username or Password", 404));
-    }
-
-    sendToken(res, user, 200, `Welcome Back ${user.name}`);
-  } catch (err) {
-    next(err);
+  const user = await User.findOne({ username }).select("+password");
+  if (!user) {
+    return next(new ErrorHandler("Invalid Username or Password", 404));
   }
-};
+
+  const isMatchPassword = await compare(password, user.password);
+  if (!isMatchPassword) {
+    return next(new ErrorHandler("Invalid Username or Password", 404));
+  }
+
+  sendToken(res, user, 200, `Welcome Back ${user.name}`);
+});
 
 // LOG-OUT
 const logout = async (req, res) => {
@@ -52,16 +49,40 @@ const logout = async (req, res) => {
     .json({ success: true, message: "Logged Out Successfully" });
 };
 
-// Search - User
-const searchUser = async (req, res) => {
-  try {
-    const { name } = req.query;
+// Search  User
+const searchUser = TryCatch(async (req, res, next) => {
+  const { name = "" } = req.query;
 
-    return res.status(200).json({ success: true, message: name });
-  } catch (error) {
-    // next(error);
-    cosonsole.log(error);
-  }
+  // finding all my chats
+  const myChats = await Chat.find({
+    groupChat: false,
+    members: { $in: [req.userId] },
+  });
+
+  // extracting all users from my chats
+  const allUsersFromMyChats = myChats.flatMap((chat) => chat.members);
+
+  // finding all users except my chats
+  const allUsersExceptMyChats = await User.find({
+    _id: { $nin: allUsersFromMyChats },
+    name: { $regex: name, $options: "i" },
+  });
+
+  const users = allUsersExceptMyChats.map(({ _id, name, avatar }) => ({
+    _id,
+    name,
+    avatar: avatar?.url,
+  }));
+
+  return res.status(200).json({ success: true, users });
+});
+
+const deleteUser = async (req, res) => {
+  await User.findByIdAndDelete(req.params.id);
+
+  return res
+    .status(200)
+    .json({ success: true, message: "User Deleted Successfully" });
 };
 
 const getMyProfile = async (req, res, next) => {
@@ -76,14 +97,6 @@ const getMyProfile = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
-
-const deleteUser = async (req, res) => {
-  await User.findByIdAndDelete(req.params.id);
-
-  return res
-    .status(200)
-    .json({ success: true, message: "User Deleted Successfully" });
 };
 
 module.exports = {
