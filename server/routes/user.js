@@ -7,6 +7,9 @@ const {
   getMyProfile,
   logout,
   searchUser,
+  sendFriendRequest,
+  getMyNotifications,
+  acceptFriendRequest
 } = require("../controllers/user");
 const { singleAvatar } = require("../middlewares/multer");
 const { isAuthenticated } = require("../middlewares/auth");
@@ -14,6 +17,8 @@ const {
   registerValidator,
   validateHandler,
   loginValidator,
+  sendRequestValidator,
+  acceptrequestValidator,
 } = require("../lib/validators");
 
 router.post(
@@ -30,6 +35,21 @@ router.post("/login", loginValidator(), validateHandler, login);
 router.use(isAuthenticated);
 
 router.get("/search", searchUser);
+router.put(
+  "/sendrequest",
+  sendRequestValidator(),
+  validateHandler,
+  sendFriendRequest
+);
+router.put(
+  "/acceptrequest",
+  acceptrequestValidator(),
+  validateHandler,
+  acceptFriendRequest
+);
+
+router.get('/notifications', getMyNotifications);
+
 router.get("/logout", logout);
 // router.post("/:id", deleteUser);
 

@@ -1,9 +1,12 @@
 const { User } = require("../models/user");
+const { Chat } = require("../models/chat");
+const { Request } = require("../models/request");
 const { sendToken } = require("../utils/JWT");
 const { compare } = require("bcrypt");
 const { cookieOptions } = require("../constants/cookie");
 const { ErrorHandler, TryCatch } = require("../utils/ErrorHandler");
-const { Chat } = require("../models/chat");
+const { NEW_REQUEST, REFETCH_CHAT } = require("../constants/events");
+const { emitEvent } = require("../utils/feature");
 
 // SIGN-UP
 const newUser = TryCatch(async (req, res, next) => {
@@ -51,12 +54,12 @@ const logout = async (req, res) => {
 
 // Search  User
 const searchUser = TryCatch(async (req, res, next) => {
-  const { name = "" } = req.query;
+  const { name } = req.query;
 
   // finding all my chats
   const myChats = await Chat.find({
     groupChat: false,
-    members: { $in: [req.userId] },
+    members: req.userId,
   });
 
   // extracting all users from my chats
@@ -77,27 +80,108 @@ const searchUser = TryCatch(async (req, res, next) => {
   return res.status(200).json({ success: true, users });
 });
 
-const deleteUser = async (req, res) => {
+// SEND FRIEND REQUEST
+const sendFriendRequest = TryCatch(async (req, res, next) => {
+  const { receiverId } = req.body;
+  const request = await Request.findOne({
+    $or: [
+      { sender: req.userId, receiver: receiverId },
+      { sender: receiverId, receiver: req.userId },
+    ],
+  });
+
+  if (request) {
+    return next(new ErrorHandler("Friend Request Already Sent", 400));
+  }
+
+  await Request.create({
+    sender: req.userId,
+    receiver: receiverId,
+  });
+
+  emitEvent(req, NEW_REQUEST, [receiverId]);
+
+  return res
+    .status(200)
+    .json({ success: true, message: "Friend Request Sent" });
+});
+
+// ACCEOPT FRIEND REQUEST
+const acceptFriendRequest = TryCatch(async (req, res, next) => {
+  const { requestId, accept } = req.body;
+  const request = await Request.findById(requestId)
+    .populate("sender", "name")
+    .populate("receiver", "name");
+
+  if (!request) return next(new ErrorHandler("Request Not Found", 404));
+
+  if (request.receiver._id.toString() !== req.userId)
+    return next(
+      new ErrorHandler("You are not authorised to accept this Request", 401)
+    );
+
+  if (!accept) {
+    await request.deleteOne();
+    return res
+      .status(200)
+      .json({ success: true, message: "Friend Request Rejected" });
+  }
+
+  const members = [request.sender._id, request.receiver._id];
+  await Promise.all([
+    Chat.create({
+      members,
+      name: `${request.sender.name} - ${request.receiver.name}`,
+    }),
+    request.deleteOne(),
+  ]);
+
+  emitEvent(req, REFETCH_CHAT, members);
+
+  return res.status(200).json({
+    success: true,
+    message: "Friend Request Accepted",
+    senderId: request.sender._id,
+    sendername: request.sender.name,
+  });
+});
+
+// GET MY NOTIFICATIONS
+const getMyNotifications = TryCatch(async (req, res, next) => {
+  const request = await Request.find({ receiver: req.userId }).populate(
+    "sender",
+    "name avatar"
+  );
+
+  const allRequest = request.map(({ sender, _id }) => ({
+    _id,
+    sender: {
+      _id: sender._id,
+      name: sender.name,
+      avatar: sender.avatar?.url,
+    },
+  }));
+
+  return res.status(200).json({ success: true, requests: allRequest });
+});
+
+const deleteUser = TryCatch(async (req, res, next) => {
   await User.findByIdAndDelete(req.params.id);
 
   return res
     .status(200)
     .json({ success: true, message: "User Deleted Successfully" });
-};
+});
 
-const getMyProfile = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.userId);
-    if (!user) {
-      return next(
-        new ErrorHandler("Sorry Amish but unfortunately we lost your Data", 404)
-      );
-    }
-    return res.status(200).json({ success: true, user });
-  } catch (error) {
-    next(error);
+const getMyProfile = TryCatch(async (req, res, next) => {
+  const user = await User.findById(req.userId);
+  if (!user) {
+    return next(
+      new ErrorHandler("Sorry Amish but unfortunately we lost your Data", 404)
+    );
   }
-};
+  return res.status(200).json({ success: true, user });
+});
 
 module.exports = {
   newUser,
@@ -106,4 +190,7 @@ module.exports = {
   searchUser,
   getMyProfile,
   deleteUser,
+  sendFriendRequest,
+  acceptFriendRequest,
+  getMyNotifications,
 };

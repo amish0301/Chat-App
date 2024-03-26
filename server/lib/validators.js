@@ -57,13 +57,24 @@ const sendAttachmentsValidator = () => [
     .withMessage("Please Upload Atleast 1 Attachment"),
 ];
 
-const chatIdValidator = () => [
-  param("id", "Please Enter Chat Id").notEmpty(),
-];
+const chatIdValidator = () => [param("id", "Please Enter Chat Id").notEmpty()];
 
 const renameGroupValidator = () => [
   param("id", "Please Enter Chat Id").notEmpty(),
   body("name", "Please Enter New Group Name").notEmpty(),
+];
+
+const sendRequestValidator = () => [
+  body("receiverId", "Please Enter User Id").notEmpty(),
+];
+
+const acceptrequestValidator = () => [
+  body("requestId", "Please Enter Request ID").notEmpty(),
+  body("accept")
+    .notEmpty()
+    .withMessage("Please Enter Accept")
+    .isBoolean()
+    .withMessage("Accept must be boolean"),
 ];
 
 module.exports = {
@@ -75,5 +86,7 @@ module.exports = {
   removeMemberValidator,
   sendAttachmentsValidator,
   chatIdValidator,
-  renameGroupValidator
+  renameGroupValidator,
+  sendRequestValidator,
+  acceptrequestValidator,
 };
