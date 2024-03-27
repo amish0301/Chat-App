@@ -9,7 +9,8 @@ const {
   searchUser,
   sendFriendRequest,
   getMyNotifications,
-  acceptFriendRequest
+  acceptFriendRequest,
+  getMyFriends
 } = require("../controllers/user");
 const { singleAvatar } = require("../middlewares/multer");
 const { isAuthenticated } = require("../middlewares/auth");
@@ -49,9 +50,10 @@ router.put(
 );
 
 router.get('/notifications', getMyNotifications);
+router.get('/friends', getMyFriends);
 
 router.get("/logout", logout);
-// router.post("/:id", deleteUser);
+router.post("/:id", deleteUser);
 
 // personal info routes
 router.get("/me", getMyProfile);

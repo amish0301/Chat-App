@@ -7,6 +7,8 @@ const { cookieOptions } = require("../constants/cookie");
 const { ErrorHandler, TryCatch } = require("../utils/ErrorHandler");
 const { NEW_REQUEST, REFETCH_CHAT } = require("../constants/events");
 const { emitEvent } = require("../utils/feature");
+const { getOtherMember } = require("../lib/helper");
+
 
 // SIGN-UP
 const newUser = TryCatch(async (req, res, next) => {
@@ -165,6 +167,35 @@ const getMyNotifications = TryCatch(async (req, res, next) => {
   return res.status(200).json({ success: true, requests: allRequest });
 });
 
+const getMyFriends = TryCatch(async (req, res, next) => {
+  const chatId = req.query.chatId;
+
+  const chat = await Chat.find({
+    members: req.userId,
+    groupChat: false,
+  }).populate("members", "name avatar");
+
+  const friends = chat.map(({ members }) => {
+    const otherUser = getOtherMember(members, req.userId);
+    return {
+      _id: otherUser._id,
+      name: otherUser.name,
+      avatar: otherUser.avatar?.url,
+    };
+  });
+
+  if(chatId) {
+    const chat = await Chat.findById(chatId);
+    const availableFriends = friends.filter((friend) => !chat.members.includes(friend._id));
+
+    return res.status(200).json({ success: true, friends: availableFriends });
+  }else {
+    return res.status(200).json({ success: true, friends });
+  }
+
+
+});
+
 const deleteUser = TryCatch(async (req, res, next) => {
   await User.findByIdAndDelete(req.params.id);
 
@@ -193,4 +224,5 @@ module.exports = {
   sendFriendRequest,
   acceptFriendRequest,
   getMyNotifications,
+  getMyFriends,
 };
