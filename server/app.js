@@ -11,6 +11,7 @@ const adminRoutes = require("./routes/admin");
 // Initialisations
 const mongouri = process.env.MONGODB_URL;
 const port = process.env.SERVER_PORT || 4000;
+const envMode = process.env.NODE_ENV.trim() || "PRODUCTION";
 
 connectMongoDB(mongouri);
 const app = express();
@@ -30,4 +31,6 @@ app.get("/", (req, res) => {
   res.send("Home Page");
 });
 
-app.listen(port, () => console.log(`Server running on ${port}`));
+app.listen(port, () =>
+  console.log(`Server running on ${port} in ${envMode} mode`)
+);

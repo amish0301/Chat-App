@@ -9,10 +9,15 @@ const { NEW_REQUEST, REFETCH_CHAT } = require("../constants/events");
 const { emitEvent } = require("../utils/feature");
 const { getOtherMember } = require("../lib/helper");
 
-
 // SIGN-UP
 const newUser = TryCatch(async (req, res, next) => {
   const { name, username, password, bio } = req.body;
+  const file = req.file;
+
+  if (!file) {
+    return next(new ErrorHandler("Please Upload Your Profile Picture", 400));
+  }
+
   const avatar = {
     public_id: "sample",
     url: "asdsdas",
@@ -184,16 +189,16 @@ const getMyFriends = TryCatch(async (req, res, next) => {
     };
   });
 
-  if(chatId) {
+  if (chatId) {
     const chat = await Chat.findById(chatId);
-    const availableFriends = friends.filter((friend) => !chat.members.includes(friend._id));
+    const availableFriends = friends.filter(
+      (friend) => !chat.members.includes(friend._id)
+    );
 
     return res.status(200).json({ success: true, friends: availableFriends });
-  }else {
+  } else {
     return res.status(200).json({ success: true, friends });
   }
-
-
 });
 
 const deleteUser = TryCatch(async (req, res, next) => {
