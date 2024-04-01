@@ -7,6 +7,11 @@ import { VisuallyHiddenInput } from '../components/styles/StyledComponents';
 import { useFileHandler, useInputValidation, useStrongPassword } from '6pp';
 import { userNameValidator } from '../utils/validator';
 import { bgGradiant } from '../components/styles/color';
+import { serverURI } from '../utils/config';
+import { useDispatch } from 'react-redux';
+import { userExists } from '../redux/reducers/auth';
+import toast from 'react-hot-toast';
+import axios from 'axios';
 
 const Login = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -26,17 +31,58 @@ const Login = () => {
         setIsLogin((prev) => !prev);
     }
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
+
+        const config = {
+            withCredentials: true,
+            headers: {
+                "Content-Type": "application/json",
+            }
+        };
+
+        try {
+            const { data } = await axios.post(`${serverURI}/api/user/login`, {
+                username: username.value,
+                password: password.value,
+            }, config);
+
+            const dispatch = useDispatch();
+            dispatch(userExists(true));
+            toast.success(data.message);
+        } catch (error) {
+            toast.error(error?.response?.data?.message || "Something went wrong");
+        }
+
     }
 
-    const handleSignUp = (e) => {
+    const handleSignUp = async (e) => {
         e.preventDefault();
+
+        const formData = new FormData();
+        formData.append("username", username.value);
+        formData.append("password", password.value);
+        formData.append("name", name.value);
+        formData.append("bio", bio.value);
+        formData.append("avatar", avatar.file);
+
+        const config = {
+            withCredentials: true,
+            headers: { "Content-Type": "multipart/form-data" }
+        };
+
+        try {
+            const { data } = await axios.post(`${serverURI}/api/user/signup`, formData, config);
+            dispatch(userExists(true));
+            toast.success(data.message);
+        } catch (error) {
+            toast.error(error?.response?.data?.message || "Something went wrong");
+        }
     }
 
     return (
-        <div style={{backgroundImage: bgGradiant}}>
-            <Container component={"main"} maxWidth="xs" sx={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+        <div style={{ backgroundImage: bgGradiant }}>
+            <Container component={"main"} maxWidth="xs" sx={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <Paper elevation={3} sx={{ padding: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: 'rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px' }}>
                     {
                         isLogin ? (<>

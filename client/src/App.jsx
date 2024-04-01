@@ -1,8 +1,13 @@
-import React, { Suspense, lazy } from 'react'
+import React, { Suspense, lazy, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import './App.css';
 import ProtectRoute from './components/auth/ProtectRoute';
 import LayoutLoader from './components/layout/Loaders';
+import { serverURI } from './utils/config';
+import { useDispatch, useSelector } from 'react-redux';
+import { userExists, userNotExists } from './redux/reducers/auth';
+import { Toaster } from "react-hot-toast";
+import axios from 'axios';
+import './App.css';
 
 // importing dynamically whenever we need the component
 const Home = lazy(() => import('./pages/Home'));
@@ -18,10 +23,15 @@ const UserManagement = lazy(() => import('./pages/admin/UserManagement'));
 const ChatManagement = lazy(() => import('./pages/admin/ChatManagement'));
 const MessageManagement = lazy(() => import('./pages/admin/MessageManagement'));
 
-let user = true;
-
 const App = () => {
-  return (
+  const { user, loader } = useSelector(state => state.auth);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    axios.get(`/${serverURI}/user/me`).then((res) => console.log(res)).catch((err) => dispatch(userNotExists()))
+  }, [])
+
+  return loader ? <LayoutLoader /> : (
     <BrowserRouter>
       <Suspense fallback={<LayoutLoader />}>
         <Routes>
@@ -32,7 +42,7 @@ const App = () => {
             <Route path='/groups' element={<Groups />} />
           </Route>
 
-          {/* if user is logged-in, but still it can't access the login page */}
+          {/* if user is alredy logged-in, if he tries to access login he can't */}
           <Route path='/login' element={<ProtectRoute user={!user} redirect="/"><Login /></ProtectRoute>} />
 
           {/* Admin Routes */}
@@ -45,6 +55,7 @@ const App = () => {
           <Route path='*' element={<NotFound />}></Route>
         </Routes>
       </Suspense>
+      <Toaster position='top-right' />
     </BrowserRouter>
   )
 }

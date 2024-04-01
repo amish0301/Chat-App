@@ -2,10 +2,11 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const { connectMongoDB } = require("./utils/connection");
 const { errorHandler } = require("./middlewares/error");
+const cors = require("cors");
 const { Server } = require("socket.io");
 const { createServer } = require("http");
 const { userSocketIDs } = require("./constants/data");
-const { NEW_MESSAGE, MEW_MESSAGE_ALERT } = require("./constants/events");
+const { NEW_MESSAGE, NEW_MESSAGE_ALERT } = require("./constants/events");
 const { getSockets } = require("./lib/helper");
 const { Message } = require("./models/message");
 require("dotenv").config({ path: "./.env" });
@@ -18,6 +19,7 @@ const adminRoutes = require("./routes/admin");
 const mongouri = process.env.MONGODB_URL;
 const port = process.env.SERVER_PORT || 4000;
 const envMode = process.env.NODE_ENV.trim() || "PRODUCTION";
+const clientUri = process.env.CLIENT_URI;
 
 connectMongoDB(mongouri);
 const app = express();
@@ -27,11 +29,15 @@ const io = new Server(server, {});
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors({
+  origin: [clientUri, "http://localhost:3000", "http://localhost:4173"],
+  credentials: true,
+}));
 
 // Routes
-app.use("/admin", adminRoutes);
-app.use("/user", userRoutes);
-app.use("/chat", chatRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Middleware for Socket
 io.use((socket, next) => {});

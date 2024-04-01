@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import AdminLayout from '../../components/layout/AdminLayout'
-import { Table } from '../../components/shared/Table';
+import Table from '../../components/shared/Table';
 
 const columns = [
   { field: 'id', headerName: 'ID', headerClassName: 'table-header', width: 200 },
