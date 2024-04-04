@@ -9,6 +9,7 @@ const { userSocketIDs } = require("./constants/data");
 const { NEW_MESSAGE, NEW_MESSAGE_ALERT } = require("./constants/events");
 const { getSockets } = require("./lib/helper");
 const { Message } = require("./models/message");
+const cloudinary = require("cloudinary").v2;
 require("dotenv").config({ path: "./.env" });
 
 const userRoutes = require("./routes/user");
@@ -22,17 +23,24 @@ const envMode = process.env.NODE_ENV.trim() || "PRODUCTION";
 const clientUri = process.env.CLIENT_URI;
 
 connectMongoDB(mongouri);
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET_KEY,
+});
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {});
+// const io = new Server(server, {});
 
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-  origin: [clientUri, "http://localhost:3000", "http://localhost:4173"],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: [clientUri, "http://localhost:3000", "http://localhost:4173"],
+    credentials: true,
+  })
+);
 
 // Routes
 app.use("/api/user", userRoutes);
@@ -40,53 +48,53 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/admin", adminRoutes);
 
 // Middleware for Socket
-io.use((socket, next) => {});
+// io.use((socket, next) => {});
 
 // Socket Io
-io.on("connection", (socket) => {
-  console.log("User Connected", socket.id);
-  const user = {
-    _id: "tmpId",
-    name: "Amish",
-  };
+// io.on("connection", (socket) => {
+//   console.log("User Connected", socket.id);
+//   const user = {
+//     _id: "tmpId",
+//     name: "Amish",
+//   };
 
-  // when user connect i'll map socket id with user id
-  userSocketIDs.set(user._id.toString(), socket.id);
+//   // when user connect i'll map socket id with user id
+//   userSocketIDs.set(user._id.toString(), socket.id);
 
-  socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
-    const messageForRealtime = {
-      content: message,
-      _id: "asdasdsadaddsadas",
-      sender: {
-        _id: user._id,
-        name: user.name,
-      },
-      chat: chatId,
-      createdAt: new Date().toISOString(),
-    };
+//   socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
+//     const messageForRealtime = {
+//       content: message,
+//       _id: "asdasdsadaddsadas",
+//       sender: {
+//         _id: user._id,
+//         name: user.name,
+//       },
+//       chat: chatId,
+//       createdAt: new Date().toISOString(),
+//     };
 
-    const messageForDB = {
-      content: message,
-      sender: user._id,
-      chat: chatId,
-    };
+//     const messageForDB = {
+//       content: message,
+//       sender: user._id,
+//       chat: chatId,
+//     };
 
-    // Sockets of all members in a Particular Chat
-    const membersSocket = getSockets(members);
-    io.to([...membersSocket]).emit(NEW_MESSAGE, {
-      chatId,
-      message: messageForRealtime,
-    });
-    io.to([...membersSocket]).emit("NEW_MESSAGE_ALERT", { chatId });
+//     // Sockets of all members in a Particular Chat
+//     const membersSocket = getSockets(members);
+//     io.to([...membersSocket]).emit(NEW_MESSAGE, {
+//       chatId,
+//       message: messageForRealtime,
+//     });
+//     io.to([...membersSocket]).emit("NEW_MESSAGE_ALERT", { chatId });
 
-    await Message.create(messageForDB);
-  });
+//     await Message.create(messageForDB);
+//   });
 
-  socket.on("disconnect", () => {
-    console.log("User Disconnected", socket.id);
-    userSocketIDs.delete(user._id.toString());
-  });
-});
+//   socket.on("disconnect", () => {
+//     console.log("User Disconnected", socket.id);
+//     userSocketIDs.delete(user._id.toString());
+//   });
+// });
 
 app.use(errorHandler); // Middleware to errors
 

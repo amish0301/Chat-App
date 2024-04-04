@@ -22,6 +22,7 @@ const Login = () => {
     const username = useInputValidation("", userNameValidator);
     const password = useStrongPassword("");
     const avatar = useFileHandler("single");
+    const dispatch = useDispatch();
 
     const handleToggle = () => {
         setShowPassword((prev) => !prev);
@@ -31,28 +32,30 @@ const Login = () => {
         setIsLogin((prev) => !prev);
     }
 
+    // Need to FIX
     const handleLogin = async (e) => {
         e.preventDefault();
 
-        const config = {
-            withCredentials: true,
-            headers: {
-                "Content-Type": "application/json",
-            }
-        };
+        // const config = {
+        //     withCredentials: true,
+        //     headers: {
+        //         "Content-Type": "application/json",
+        //     }
+        // };
 
-        try {
-            const { data } = await axios.post(`${serverURI}/api/user/login`, {
-                username: username.value,
-                password: password.value,
-            }, config);
+        // try {
+        //     const { data } = await axios.post(`${serverURI}/api/user/login`, {
+        //         username: username.value,
+        //         password: password.value,
+        //     }, config);
 
-            const dispatch = useDispatch();
-            dispatch(userExists(true));
-            toast.success(data.message);
-        } catch (error) {
-            toast.error(error?.response?.data?.message || "Something went wrong");
-        }
+        //     dispatch(userExists(true));
+        //     toast.success(data.message);
+        // } catch (error) {
+        //     toast.error(error?.response?.data?.message || "Something went wrong");
+        // }
+
+        toast.error("Sorry!");
 
     }
 
@@ -60,23 +63,28 @@ const Login = () => {
         e.preventDefault();
 
         const formData = new FormData();
-        formData.append("username", username.value);
-        formData.append("password", password.value);
+        formData.append("avatar", avatar.file);
         formData.append("name", name.value);
         formData.append("bio", bio.value);
-        formData.append("avatar", avatar.file);
+        formData.append("username", username.value);
+        formData.append("password", password.value);
 
         const config = {
             withCredentials: true,
-            headers: { "Content-Type": "multipart/form-data" }
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
         };
 
         try {
             const { data } = await axios.post(`${serverURI}/api/user/signup`, formData, config);
-            dispatch(userExists(true));
+            console.log(data);
+            // control not reaching
+
+            dispatch(userExists(data.user));
             toast.success(data.message);
         } catch (error) {
-            toast.error(error?.response?.data?.message || "Something went wrong");
+            console.log(error?.response?.data?.message || "Something went wrong");
         }
     }
 

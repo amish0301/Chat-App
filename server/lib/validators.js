@@ -5,7 +5,7 @@ const validateHandler = (req, res, next) => {
   const errors = validationResult(req);
   const allErrors = errors
     .array()
-    .map((err) => err.msg)
+    .map((error) => error.message)
     .join(", ");
 
   if (errors.isEmpty()) return next();

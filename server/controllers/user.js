@@ -6,7 +6,7 @@ const { compare } = require("bcrypt");
 const { cookieOptions } = require("../constants/cookie");
 const { ErrorHandler, TryCatch } = require("../utils/ErrorHandler");
 const { NEW_REQUEST, REFETCH_CHAT } = require("../constants/events");
-const { emitEvent } = require("../utils/feature");
+const { emitEvent, uploadFilesToCloudinary } = require("../utils/feature");
 const { getOtherMember } = require("../lib/helper");
 
 // SIGN-UP
@@ -18,9 +18,11 @@ const newUser = TryCatch(async (req, res, next) => {
     return next(new ErrorHandler("Please Upload Your Profile Picture", 400));
   }
 
+  const result = await uploadFilesToCloudinary([file]);
+
   const avatar = {
-    public_id: "sample",
-    url: "asdsdas",
+    public_id: result[0].public_id,
+    url: result[0].url,
   };
 
   const user = await User.create({

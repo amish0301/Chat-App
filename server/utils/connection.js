@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 const connectMongoDB = async (uri) => {
   await mongoose
     .connect(uri)
-    .then(() => {
-      console.log('mongoDB connected successfully');
+    .then((data) => {
+      console.log(`Connected to DB: ${data.connection.name}`);
     })
     .catch((err) => {
       throw err;
