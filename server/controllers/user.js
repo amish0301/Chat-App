@@ -215,7 +215,7 @@ const getMyProfile = TryCatch(async (req, res, next) => {
   const user = await User.findById(req.userId);
   if (!user) {
     return next(
-      new ErrorHandler("Sorry Amish but unfortunately we lost your Data", 404)
+      new ErrorHandler("User Not found", 404)
     );
   }
   return res.status(200).json({ success: true, user });

@@ -21,5 +21,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { userExists, userNotExists } = authSlice.actions;
 export default authSlice;
+export const { userExists, userNotExists } = authSlice.actions;

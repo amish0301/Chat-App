@@ -36,26 +36,24 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
 
-        // const config = {
-        //     withCredentials: true,
-        //     headers: {
-        //         "Content-Type": "application/json",
-        //     }
-        // };
+        const config = {
+            withCredentials: true,
+            headers: {
+                "Content-Type": "application/json",
+            }
+        };
 
-        // try {
-        //     const { data } = await axios.post(`${serverURI}/api/user/login`, {
-        //         username: username.value,
-        //         password: password.value,
-        //     }, config);
+        try {
+            const { data } = await axios.post(`${serverURI}/api/user/login`, {
+                username: username.value,
+                password: password.value,
+            }, config);
 
-        //     dispatch(userExists(true));
-        //     toast.success(data.message);
-        // } catch (error) {
-        //     toast.error(error?.response?.data?.message || "Something went wrong");
-        // }
-
-        toast.error("Sorry!");
+            dispatch(userExists(data.user));
+            toast.success(data.message);
+        } catch (error) {
+            toast.error(error?.response?.data?.message || "Something went wrong");
+        }
 
     }
 
@@ -69,6 +67,8 @@ const Login = () => {
         formData.append("username", username.value);
         formData.append("password", password.value);
 
+        if(!avatar.file) return toast.error("Please upload your profile picture");
+
         const config = {
             withCredentials: true,
             headers: {
@@ -78,9 +78,6 @@ const Login = () => {
 
         try {
             const { data } = await axios.post(`${serverURI}/api/user/signup`, formData, config);
-            console.log(data);
-            // control not reaching
-
             dispatch(userExists(data.user));
             toast.success(data.message);
         } catch (error) {
