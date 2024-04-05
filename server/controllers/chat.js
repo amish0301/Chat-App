@@ -39,8 +39,6 @@ const getMyChats = TryCatch(async (req, res, next) => {
     members: req.userId,
   }).populate("members", "name avatar");
 
-  // return res.status(200).json({ success: true, chats });
-
   // we can also use aggregation pipeline here
   const transformedChats = chats.map(({ _id, name, members, groupChat }) => {
     const otherMember = getOtherMember(members, req.userId);

@@ -28,8 +28,16 @@ const App = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    axios.get(`${serverURI}/api/user/me`, { withCredentials: true }).then(({ data }) => dispatch(userExists(data.user))).catch((err) => dispatch(userNotExists()));
-  }, [dispatch])
+    async function checkUser() {
+      const { data } = await axios.get(`${serverURI}/api/user/me`, { withCredentials: true });
+      if (data.user) {
+        dispatch(userExists(data.user));
+      } else {
+        dispatch(userNotExists());
+      }
+    }
+    checkUser();
+  }, [user]);
 
   return loader ? <LayoutLoader /> : (
     <BrowserRouter>
