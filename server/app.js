@@ -3,13 +3,14 @@ const cookieParser = require("cookie-parser");
 const { connectMongoDB } = require("./utils/connection");
 const { errorHandler } = require("./middlewares/error");
 const cors = require("cors");
+const http = require("http");
 const { Server } = require("socket.io");
-const { createServer } = require("http");
 const { userSocketIDs } = require("./constants/data");
 const { NEW_MESSAGE, NEW_MESSAGE_ALERT } = require("./constants/events");
 const { getSockets } = require("./lib/helper");
 const { Message } = require("./models/message");
 const cloudinary = require("cloudinary").v2;
+const { cloudinaryConfigs, corsOptions } = require("../client/src/utils/config");
 require("dotenv").config({ path: "./.env" });
 
 const userRoutes = require("./routes/user");
@@ -20,27 +21,18 @@ const adminRoutes = require("./routes/admin");
 const mongouri = process.env.MONGODB_URL;
 const port = process.env.SERVER_PORT || 4000;
 const envMode = process.env.NODE_ENV.trim() || "PRODUCTION";
-const clientUri = process.env.CLIENT_URI;
 
 connectMongoDB(mongouri);
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_SECRET_KEY,
-});
+cloudinary.config(cloudinaryConfigs);
+
 const app = express();
-const server = createServer(app);
+const server = http.createServer(app);
 const io = new Server(server, {});
 
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-  cors({
-    origin: [clientUri, "http://localhost:3000", "http://localhost:4173"],
-    credentials: true,
-  })
-);
+app.use(cors(corsOptions));
 
 // Routes
 app.use("/api/user", userRoutes);
@@ -50,7 +42,7 @@ app.use("/api/admin", adminRoutes);
 // Middleware for Socket
 io.use((socket, next) => {});
 
-// Socket Io
+// Socket-io
 io.on("connection", (socket) => {
   console.log("User Connected", socket.id);
   const user = {
@@ -96,7 +88,7 @@ io.on("connection", (socket) => {
   });
 });
 
-app.use(errorHandler); // Middleware to errors
+app.use(errorHandler); // Middleware for errors
 
 // default Home Route
 app.get("/", (req, res) => {

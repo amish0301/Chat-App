@@ -10,7 +10,6 @@ const {
   NEW_MESSAGE_ALERT,
 } = require("../constants/events");
 const { attachmentsMulter } = require("../middlewares/multer");
-const mongoose = require("mongoose");
 
 const newGroupChat = TryCatch(async (req, res, next) => {
   const { name, members } = req.body;
