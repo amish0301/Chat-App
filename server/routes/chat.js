@@ -51,7 +51,7 @@ router
   .delete(chatIdValidator(), validateHandler, deleteChat);
 
 // fetching Personal info of user
-router.get("/my", getMyChats);
+router.get("/my/chats", getMyChats);
 router.get("/my/groups", getMyGroups);
 
 module.exports = router;

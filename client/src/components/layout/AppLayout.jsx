@@ -8,6 +8,7 @@ import Profile from '../Profile'
 import { useMyChatQuery } from '../../redux/apis/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setIsMobile } from '../../redux/reducers/misc';
+import { useXErrors } from '../../hooks/hook';
 
 const AppLayout = () => (WrappedComponent) => {
     return (props) => {
@@ -15,9 +16,12 @@ const AppLayout = () => (WrappedComponent) => {
         const chatId = params.chatId;
         const dispatch = useDispatch();
 
-        // all below destructured data is provided by default RTK query
-        const { isLoading, data, isError, error, refetch } = useMyChatQuery();
         const { isMobile } = useSelector(state => state.utility);
+
+        // all below destructured data is provided by default RTK query
+        const { isLoading, data, isError, error, refetch } = useMyChatQuery("");
+        // for errors
+        useXErrors([{ isError, error }]);
 
         const handleDeleteChat = (e, _id, groupChat) => {
             e.preventDefault();

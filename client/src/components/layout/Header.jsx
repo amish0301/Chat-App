@@ -12,9 +12,8 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import axios from 'axios';
 import { serverURI } from '../../utils/config';
 import toast from 'react-hot-toast';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { userNotExists } from '../../redux/reducers/auth';
-import { setIsMobile } from '../../redux/reducers/misc';
 
 const SearchDialog = lazy(() => import('../dialogs/SearchDialog'));
 const Notification = lazy(() => import('../dialogs/Notification'));
@@ -24,20 +23,13 @@ const Header = () => {
 
     const dispatch = useDispatch();
 
-    const [isSearch, setIsSearch] = useState(false);
-    const [isNewGroup, setIsNewGroup] = useState(false);
+    const { isSearch, setIsMobile, setIsSearch, isNewGroup, setIsNewGroup } = useSelector(state => state.utility);
     const [isNotification, setIsNotification] = useState(false);
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
-    const handleMobile = () => {
-        dispatch(setIsMobile(true));
-    }
-    const openSearch = () => {
-        setIsSearch(prev => !prev);
-    }
-    const openNewGroup = () => {
-        setIsNewGroup(prev => !prev);
-    }
+    const handleMobile = () => dispatch(setIsMobile(true));
+    const openSearch = () => dispatch(setIsSearch(true));
+    const openNewGroup = () => dispatch(setIsNewGroup(true));
 
     const openNotification = () => {
         setIsNotification(prev => !prev);

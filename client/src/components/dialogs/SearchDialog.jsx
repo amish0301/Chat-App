@@ -4,20 +4,21 @@ import { Search as SearchIcon, Close as CloseIcon } from '@mui/icons-material'
 import { useInputValidation } from '6pp'
 import UserItem from '../shared/UserItem'
 import { sampleUsers } from '../../utils/sampleData'
+import { useSelector, useDispatch } from 'react-redux'
 
 const SearchDialog = () => {
-  // const users = [];
+  const dispatch = useDispatch();
+  const { isSearch, setIsSearch } = useSelector(state => state.utility);
+  
   const search = useInputValidation("");
   const [users, setUsers] = useState(sampleUsers);
-  const [isOpenDialog, setIsOpenDialog] = useState(true);
   let isLoadingSendFriendRequest = false; // it should be in a state
-  const addFriendHandler = (id) => {
 
-  };
-  const closeDialog = () => setIsOpenDialog(prev => !prev);
+  const addFriendHandler = (id) => { };
+  const closeDialog = () => dispatch(setIsSearch(false));
 
   return (
-    <Dialog open={isOpenDialog}>
+    <Dialog open={isSearch} onClose={closeDialog}>
       <Stack p={'2rem'} maxWidth={'25rem'}>
         <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <DialogTitle textAlign={'center'}>Find People</DialogTitle>
