@@ -5,18 +5,29 @@ import { useInputValidation } from '6pp'
 import UserItem from '../shared/UserItem'
 import { useSelector, useDispatch } from 'react-redux'
 import { setIsSearch } from '../../redux/reducers/misc'
-import { useLazySearchUserQuery } from '../../redux/apis/api'
+import { useLazySearchUserQuery, useSendFriendRequestMutation } from '../../redux/apis/api'
+import { toast } from 'react-hot-toast'
 
 const SearchDialog = () => {
   const dispatch = useDispatch();
   const { isSearch } = useSelector(state => state.utility);
   const [searchUser] = useLazySearchUserQuery();
+  const [sendFriendRequest] = useSendFriendRequestMutation();
   const [users, setUsers] = useState([]);
 
   const search = useInputValidation("");
   let isLoadingSendFriendRequest = false; // it should be in a state
 
-  const addFriendHandler = (id) => { };
+  const addFriendHandler = async (id) => {
+    try {
+      const res = await sendFriendRequest({ receiverId: id });
+      if (res.data) toast.success("Friend Request Sent");
+      else toast.error(res?.error?.data?.message || 'Something went Wrong!!');
+    } catch (error) {
+      console.log(error);
+      toast.error('Something went Wrong!!');
+    }
+  };
   const closeDialog = () => dispatch(setIsSearch(false));
 
   useEffect(() => {
