@@ -1,10 +1,10 @@
 const jwt = require("jsonwebtoken");
 const { ErrorHandler } = require("../utils/ErrorHandler");
-const { adminSecretKey } = require("../constants/data");
+const { adminSecretKey} = require("../constants/data");
 
 const isAuthenticated = (req, res, next) => {
   try {
-    const token = req.cookies["uid"];
+    const token = req.cookies.uid;
     if (!token) return next(new ErrorHandler("Please Login First", 401));
 
     const decodeData = jwt.verify(token, process.env.JWT_SECRET);
@@ -18,7 +18,7 @@ const isAuthenticated = (req, res, next) => {
 
 const adminAuth = (req, res, next) => {
   try {
-    const token = req.cookies["adminToken"];
+    const token = req.cookies[process.env.ADMIN_TOKEN];
     if (!token) return next(new ErrorHandler("Only Admins can access", 401));
 
     const secretKey = jwt.verify(token, process.env.JWT_SECRET);

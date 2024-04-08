@@ -63,7 +63,7 @@ const logout = async (req, res) => {
 
 // Search  User
 const searchUser = TryCatch(async (req, res, next) => {
-  const { name } = req.query;
+  const { name = "" } = req.query;
 
   // finding all my chats
   const myChats = await Chat.find({
@@ -79,14 +79,14 @@ const searchUser = TryCatch(async (req, res, next) => {
     _id: { $nin: allUsersFromMyChats },
     name: { $regex: name, $options: "i" },
   });
-
+  
   const users = allUsersExceptMyChats.map(({ _id, name, avatar }) => ({
     _id,
     name,
     avatar: avatar?.url,
   }));
 
-  return res.status(200).json({ success: true, users });
+  return res.status(200).json({ success: true, users: users });
 });
 
 // SEND FRIEND REQUEST

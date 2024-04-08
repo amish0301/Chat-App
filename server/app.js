@@ -10,7 +10,6 @@ const { NEW_MESSAGE, NEW_MESSAGE_ALERT } = require("./constants/events");
 const { getSockets } = require("./lib/helper");
 const { Message } = require("./models/message");
 const cloudinary = require("cloudinary").v2;
-const { cloudinaryConfigs, corsOptions } = require("../client/src/utils/config");
 require("dotenv").config({ path: "./.env" });
 
 const userRoutes = require("./routes/user");
@@ -21,9 +20,19 @@ const adminRoutes = require("./routes/admin");
 const mongouri = process.env.MONGODB_URL;
 const port = process.env.SERVER_PORT || 4000;
 const envMode = process.env.NODE_ENV.trim() || "PRODUCTION";
+const clientUri = process.env.CLIENT_URI;
+const corsOptions = {
+  origin: clientUri,
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
 
 connectMongoDB(mongouri);
-cloudinary.config(cloudinaryConfigs);
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET_KEY,
+});
 
 const app = express();
 const server = http.createServer(app);
