@@ -49,10 +49,10 @@ const Login = () => {
                 password: password.value,
             }, config);
 
-            dispatch(userExists(data.user));
+            await dispatch(userExists(data.user));
             toast.success(data.message);
         } catch (error) {
-            toast.error(error?.response?.data?.message || "Something went wrong");
+            console.log(error?.response?.data?.message);
         }
 
     }
@@ -67,7 +67,7 @@ const Login = () => {
         formData.append("username", username.value);
         formData.append("password", password.value);
 
-        if(!avatar.file) return toast.error("Please upload your profile picture");
+        if (!avatar.file) return toast.error("Please upload your profile picture");
 
         const config = {
             withCredentials: true,

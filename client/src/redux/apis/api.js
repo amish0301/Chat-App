@@ -3,19 +3,27 @@ import { serverURI } from "../../utils/config";
 
 const api = createApi({
   reducerPath: "api",
-  baseQuery: fetchBaseQuery({ baseUrl: `${serverURI}/api/` }),
-  tagTypes: ["Chat"],
+  baseQuery: fetchBaseQuery({ baseUrl: `${serverURI}/api` }),
+  tagTypes: [["Chat"], ["User"]],
 
   endpoints: (builder) => ({
     myChat: builder.query({
       query: () => ({
-        url: "chat/my",
+        url: "/chat/my",
         credentials: "include",
       }),
       providesTags: ["Chat"],
+    }),
+
+    searchUser: builder.query({
+      query: (search) => ({
+        url: `/user/search?name=${search}`,
+        credentials: "include",
+      }),
+      providesTags: ["User"],
     }),
   }),
 });
 
 export default api;
-export const { useMyChatQuery } = api;
+export const { useMyChatQuery, useLazySearchUserQuery } = api;

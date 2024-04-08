@@ -27,17 +27,26 @@ const App = () => {
   const { user, loader } = useSelector(state => state.auth);
   const dispatch = useDispatch();
 
+  // check for refactoring below useEffect
   useEffect(() => {
     async function checkUser() {
-      const { data } = await axios.get(`${serverURI}/api/user/me`, { withCredentials: true });
-      if (data.user) {
-        dispatch(userExists(data.user));
-      } else {
-        dispatch(userNotExists());
+      try {
+        const response = await axios.get(`${serverURI}/api/user/me`, { withCredentials: true });
+        if (response.status === 200) {
+          dispatch(userExists(response.data.user));
+        } else {
+          dispatch(userNotExists());
+        }
+      } catch (error) {
+        if(error.response && error.response.status === 401) {
+          dispatch(userNotExists());
+        }
       }
     }
+
     checkUser();
   }, [user]);
+
 
   return loader ? <LayoutLoader /> : (
     <BrowserRouter>

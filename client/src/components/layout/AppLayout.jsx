@@ -20,6 +20,7 @@ const AppLayout = () => (WrappedComponent) => {
 
         // all below destructured data is provided by default RTK query
         const { isLoading, data, isError, error, refetch } = useMyChatQuery("");
+        
         // for errors
         useXErrors([{ isError, error }]);
 
