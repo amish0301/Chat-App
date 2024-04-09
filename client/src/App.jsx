@@ -35,7 +35,7 @@ const App = () => {
         if (response.status === 200) {
           dispatch(userExists(response.data.user));
         } else {
-          dispatch(userNotExists());
+        dispatch(userNotExists());
         }
       } catch (error) {
         if(error.response && error.response.status === 401) {

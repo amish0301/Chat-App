@@ -7,27 +7,21 @@ import { useSelector, useDispatch } from 'react-redux'
 import { setIsSearch } from '../../redux/reducers/misc'
 import { useLazySearchUserQuery, useSendFriendRequestMutation } from '../../redux/apis/api'
 import { toast } from 'react-hot-toast'
+import { useAsyncMutation } from '../../hooks/hook'
 
 const SearchDialog = () => {
   const dispatch = useDispatch();
   const { isSearch } = useSelector(state => state.utility);
   const [searchUser] = useLazySearchUserQuery();
-  const [sendFriendRequest] = useSendFriendRequestMutation();
+  const [sendFriendRequest, isLoading] = useAsyncMutation(useSendFriendRequestMutation);
   const [users, setUsers] = useState([]);
 
   const search = useInputValidation("");
-  let isLoadingSendFriendRequest = false; // it should be in a state
 
   const addFriendHandler = async (id) => {
-    try {
-      const res = await sendFriendRequest({ receiverId: id });
-      if (res.data) toast.success("Friend Request Sent");
-      else toast.error(res?.error?.data?.message || 'Something went Wrong!!');
-    } catch (error) {
-      console.log(error);
-      toast.error('Something went Wrong!!');
-    }
+    sendFriendRequest("Sending Friend request...", { receiverId: id })
   };
+
   const closeDialog = () => dispatch(setIsSearch(false));
 
   useEffect(() => {
@@ -56,7 +50,7 @@ const SearchDialog = () => {
         <List sx={{ maxHeight: '15rem', overflow: 'auto', marginTop: '1rem' }}>
           {
             users.map((user) => (
-              <UserItem user={user} key={user._id} handler={addFriendHandler} handlerIsLoading={isLoadingSendFriendRequest} />
+              <UserItem user={user} key={user._id} handler={addFriendHandler} handlerIsLoading={isLoading} />
             ))
           }
         </List>
