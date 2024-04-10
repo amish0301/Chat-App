@@ -115,7 +115,7 @@ const sendFriendRequest = TryCatch(async (req, res, next) => {
     .json({ success: true, message: "Friend Request Sent" });
 });
 
-// ACCEOPT FRIEND REQUEST
+// ACCEPT FRIEND REQUEST
 const acceptFriendRequest = TryCatch(async (req, res, next) => {
   const { requestId, accept } = req.body;
   const request = await Request.findById(requestId)

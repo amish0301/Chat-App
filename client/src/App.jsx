@@ -8,6 +8,7 @@ import { userExists, userNotExists } from './redux/reducers/auth';
 import { Toaster } from "react-hot-toast";
 import axios from 'axios';
 import './App.css';
+import { SocketProvider } from './socket';
 
 // importing dynamically whenever we need the component
 const Home = lazy(() => import('./pages/Home'));
@@ -35,10 +36,10 @@ const App = () => {
         if (response.status === 200) {
           dispatch(userExists(response.data.user));
         } else {
-        dispatch(userNotExists());
+          dispatch(userNotExists());
         }
       } catch (error) {
-        if(error.response && error.response.status === 401) {
+        if (error.response && error.response.status === 401) {
           dispatch(userNotExists());
         }
       }
@@ -53,7 +54,7 @@ const App = () => {
       <Suspense fallback={<LayoutLoader />}>
         <Routes>
           {/* if user exist then only u can access below routes */}
-          <Route element={<ProtectRoute user={user} />}>
+          <Route element={<SocketProvider><ProtectRoute user={user} /></SocketProvider>}>
             <Route path='/' element={<Home />} />
             <Route path='/chat/:chatId' element={<Chat />} />
             <Route path='/groups' element={<Groups />} />

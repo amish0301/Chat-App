@@ -41,4 +41,4 @@ const useAsyncMutation = (mutationHook) => {
     return [executeMutation, isLoading, data];
 }
 
-export { useXErrors }
+export { useXErrors, useAsyncMutation };

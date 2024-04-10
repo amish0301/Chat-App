@@ -17,6 +17,10 @@ const userSchema = new mongoose.Schema(
       required: true,
       select: false,
     },
+    bio: {
+      type: String,
+      default: "Hey, I am using Chat App",
+    },
     avatar: {
       public_id: {
         type: String,

@@ -10,6 +10,7 @@ const { NEW_MESSAGE, NEW_MESSAGE_ALERT } = require("./constants/events");
 const { getSockets } = require("./lib/helper");
 const { Message } = require("./models/message");
 const cloudinary = require("cloudinary").v2;
+const { socketAuthenticater } = require("./middlewares/auth");
 require("dotenv").config({ path: "./.env" });
 
 const userRoutes = require("./routes/user");
@@ -36,7 +37,9 @@ cloudinary.config({
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {});
+const io = new Server(server, {
+  cors: corsOptions,
+});
 
 // Middlewares
 app.use(express.json());
@@ -49,15 +52,18 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/admin", adminRoutes);
 
 // Middleware for Socket
-io.use((socket, next) => {});
+io.use((socket, next) => {
+  cookieParser()(
+    socket.request,
+    socket.request.res,
+    async (err) => await socketAuthenticater({ err: err || null, socket, next })
+  );
+});
 
 // Socket-io
 io.on("connection", (socket) => {
   console.log("User Connected", socket.id);
-  const user = {
-    _id: "tmpId",
-    name: "Amish",
-  };
+  const user = socket.user;
 
   // when user connect i'll map socket id with user id
   userSocketIDs.set(user._id.toString(), socket.id);

@@ -14,7 +14,7 @@ import { serverURI } from '../../utils/config';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { userNotExists } from '../../redux/reducers/auth';
-import { setIsSearch, setIsMobile, setIsNewGroup } from '../../redux/reducers/misc';
+import { setIsSearch, setIsMobile, setIsNewGroup, setIsNotification } from '../../redux/reducers/misc';
 
 const SearchDialog = lazy(() => import('../dialogs/SearchDialog'));
 const Notification = lazy(() => import('../dialogs/Notification'));
@@ -23,18 +23,18 @@ const NewGroup = lazy(() => import('../dialogs/NewGroup'));
 const Header = () => {
 
     const dispatch = useDispatch();
-
-    const { isSearch, isNewGroup } = useSelector(state => state.utility);
-    const [isNotification, setIsNotification] = useState(false);
-    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+    const { isSearch, isNewGroup, isNotification } = useSelector(state => state.utility);
 
     const handleMobile = () => dispatch(setIsMobile(true));
     const openSearch = () => dispatch(setIsSearch(true));
     const openNewGroup = () => dispatch(setIsNewGroup(true));
 
     const openNotification = () => {
-        setIsNotification(prev => !prev);
-        setIsNotificationOpen(prev => !prev);
+        if (isNotification) {
+            dispatch(setIsNotification(false));
+        }else {
+            dispatch(setIsNotification(true));
+        }
     }
 
     const navigate = useNavigate();
@@ -81,7 +81,7 @@ const Header = () => {
                             </Tooltip>
                             <Tooltip title={"Notifications"}>
                                 <IconButton color='inherit' size='large' onClick={openNotification}>
-                                    {isNotificationOpen ? <NotificationsIcon /> : <NotificationsNoneIcon />}
+                                    {isNotification ? <NotificationsIcon /> : <NotificationsNoneIcon />}
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title={"Logout"}>

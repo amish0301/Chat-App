@@ -25,7 +25,7 @@ const utilitySlice = createSlice({
     setIsAddMember: (state, action) => {
       state.isAddMember = action.payload;
     },
-    isNotification: (state, action) => {
+    setIsNotification: (state, action) => {
       state.isNotification = action.payload;
     },
     setIsMobile: (state, action) => {

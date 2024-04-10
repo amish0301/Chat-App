@@ -1,10 +1,13 @@
 const jwt = require("jsonwebtoken");
 const { ErrorHandler } = require("../utils/ErrorHandler");
-const { adminSecretKey} = require("../constants/data");
+const { adminSecretKey } = require("../constants/data");
+const path = require("path");
+const { User } = require("../models/user");
+require("dotenv").config({ path: path.resolve("/server", "../.env") });
 
 const isAuthenticated = (req, res, next) => {
   try {
-    const token = req.cookies.uid;
+    const token = req.cookies[process.env.CHAT_APP_TOKEN];
     if (!token) return next(new ErrorHandler("Please Login First", 401));
 
     const decodeData = jwt.verify(token, process.env.JWT_SECRET);
@@ -32,4 +35,22 @@ const adminAuth = (req, res, next) => {
   }
 };
 
-module.exports = { isAuthenticated, adminAuth };
+const socketAuthenticater = async ({ err, socket, next }) => {
+  try {
+    if (err) return next(err);
+
+    const authToken = socket.request.cookies[process.env.CHAT_APP_TOKEN];
+    if (!authToken) return next(new ErrorHandler("Please Login First", 401));
+    const decodeData = jwt.verify(authToken, process.env.JWT_SECRET);
+    const user = await User.findById(decodeData._id);
+
+    if (!user) return next(new ErrorHandler("Please Login First", 401));
+    socket.user = user;
+
+    return next();
+  } catch (error) {
+    return next(new ErrorHandler("Please Login First", 401));
+  }
+};
+
+module.exports = { isAuthenticated, adminAuth, socketAuthenticater };

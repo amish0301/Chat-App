@@ -9,6 +9,7 @@ const {
   adminLogout,
   getAdminData,
 } = require("../controllers/admin");
+
 const { adminLoginValidator, validateHandler } = require("../lib/validators");
 const { adminAuth } = require("../middlewares/auth");
 

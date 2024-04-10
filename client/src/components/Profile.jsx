@@ -1,6 +1,6 @@
 import React from 'react'
 import { Avatar, Box, Stack, Typography } from '@mui/material'
-import { Person as PersonIcon, Info as InfoIcon, Phone as PhoneIcon, CalendarMonth as CalendarIcon, ModeComment } from '@mui/icons-material';
+import { Person as PersonIcon, Info as InfoIcon, Phone as PhoneIcon, CalendarMonth as CalendarIcon } from '@mui/icons-material';
 import moment from 'moment';
 import { transformImage } from '../lib/feature';
 
