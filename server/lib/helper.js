@@ -5,7 +5,7 @@ const getOtherMember = (members, userId) => {
 };
 
 const getSockets = (users = []) => {
-  const sockets = users.map((user) => userSocketIDs.get(user._id.toString()));
+  const sockets = users.map((userIDs) => userSocketIDs.get(userIDs.toString()));
   return sockets;
 };
 

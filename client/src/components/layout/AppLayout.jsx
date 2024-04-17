@@ -26,7 +26,7 @@ const AppLayout = () => (WrappedComponent) => {
 
         // all below destructured data is provided by default RTK query
         const { isLoading, data, isError, error, refetch } = useMyChatQuery("");
-        
+
         // for errors
         useXErrors([{ isError, error }]);
 
@@ -50,10 +50,10 @@ const AppLayout = () => (WrappedComponent) => {
                         }
                     </Grid>
                     <Grid item xs={12} sm={8} md={5} lg={6} height={"100%"}>
-                        <WrappedComponent {...props} />
+                        <WrappedComponent {...props} chatId={chatId} />
                     </Grid>
                     <Grid item md={4} lg={3} sx={{ display: { xs: 'none', md: 'block' }, padding: '1rem', bgcolor: 'rgba(0,0,0,0.5)' }} height={"100%"}>
-                        <Profile user = {user}/>
+                        <Profile user={user} />
                     </Grid>
                 </Grid>
 

@@ -62,7 +62,7 @@ io.use((socket, next) => {
 
 // Socket-io
 io.on("connection", (socket) => {
-  console.log("User Connected", socket.id);
+  // console.log("User Connected", socket.id);
   const user = socket.user;
 
   // when user connect i'll map socket id with user id
@@ -98,7 +98,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("User Disconnected", socket.id);
+    // console.log("User Disconnected", socket.id);
     userSocketIDs.delete(user._id.toString());
   });
 });
