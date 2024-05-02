@@ -12,6 +12,7 @@ const { getOtherMember } = require("../lib/helper");
 // SIGN-UP
 const newUser = TryCatch(async (req, res, next) => {
   const { name, username, password, bio } = req.body;
+
   const file = req.file;
 
   if (!file) {

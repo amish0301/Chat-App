@@ -44,14 +44,16 @@ const useAsyncMutation = (mutationHook) => {
 
 const useSocketEvents = (socket, eventArray) => {
     useEffect(() => {
-        Object.entries(eventArray).forEach(([events, handler]) => {
-            socket.on(events, handler);
+        Object.entries(eventArray).forEach(([event, handler]) => {
+            socket.on(event, handler);
         });
 
         return () => {
-            socket.off(events, handler);
-        };
-    }, [socket,eventArray])
+            Object.entries(eventArray).forEach(([event, handler]) => {
+                socket.off(event, handler);
+            });
+        }
+    }, [socket, eventArray])
 }
 
 export { useXErrors, useAsyncMutation, useSocketEvents };
