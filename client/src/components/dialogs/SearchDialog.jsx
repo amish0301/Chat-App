@@ -6,7 +6,6 @@ import UserItem from '../shared/UserItem'
 import { useSelector, useDispatch } from 'react-redux'
 import { setIsSearch } from '../../redux/reducers/misc'
 import { useLazySearchUserQuery, useSendFriendRequestMutation } from '../../redux/apis/api'
-import { toast } from 'react-hot-toast'
 import { useAsyncMutation } from '../../hooks/hook'
 
 const SearchDialog = () => {
@@ -49,7 +48,7 @@ const SearchDialog = () => {
         {/* Search results */}
         <List sx={{ maxHeight: '15rem', overflow: 'auto', marginTop: '1rem' }}>
           {
-            users.map((user) => (
+            users?.map((user) => (
               <UserItem user={user} key={user._id} handler={addFriendHandler} handlerIsLoading={isLoading} />
             ))
           }

@@ -24,7 +24,7 @@ const Profile = ({ user }) => {
 
     return (
         <div>
-            <Box sx={{ marginBottom: '3rem' }}>
+            <Box sx={{ marginBottom: '2rem' }}>
                 <Typography variant='h6' fontWeight={'bolder'} letterSpacing={1}>Profile</Typography>
             </Box>
             <Stack alignItems={'center'} spacing={'3rem'}>

@@ -6,12 +6,12 @@ import { fileFormat } from '../../lib/feature'
 import RenderAttachment from './RenderAttachment';
 
 const MessageComponent = ({ message, user }) => {
-  const { sender, content, attachments = [] , createdAt } = message;
+  const { sender, content, attachments = [], createdAt } = message;
   const sameSender = sender?._id === user?._id;
   const timeAgo = moment(createdAt).fromNow();
 
   return (
-    <div style={{ alignSelf: sameSender ? 'flex-end' : 'flex-start', backgroundColor: 'white', color: "black", borderRadius: '5px', padding: '.5rem', width: 'fit-content' }}>
+    <div style={{ alignSelf: sameSender ? 'flex-end' : 'flex-start', backgroundColor: 'white', color: "black", borderRadius: '5px', padding: '.5rem', width: 'fit-content', cursor: 'pointer' }} >
 
       {!sameSender && <Typography variant='caption' color={lightBlue} fontWeight={'600'}>{sender.name}</Typography>}
 
@@ -26,9 +26,9 @@ const MessageComponent = ({ message, user }) => {
 
             return (
               <Box key={index}>
-                <a href={url} target='_blank' download style={{color: 'black',}}>
+                <a href={url} target='_blank' download style={{ color: 'black', }}>
                   {
-                    RenderAttachment(file,url)
+                    RenderAttachment(file, url)
                   }
                 </a>
               </Box>

@@ -4,7 +4,7 @@ import ProtectRoute from './components/auth/ProtectRoute';
 import LayoutLoader from './components/layout/Loaders';
 import { serverURI } from './utils/config';
 import { useDispatch, useSelector } from 'react-redux';
-import { userExists, userNotExists } from './redux/reducers/auth';
+import { setLoading, userExists, userNotExists } from './redux/reducers/auth';
 import { Toaster } from "react-hot-toast";
 import axios from 'axios';
 import './App.css';
@@ -32,6 +32,7 @@ const App = () => {
   useEffect(() => {
     async function checkUser() {
       try {
+        setLoading(true);
         const response = await axios.get(`${serverURI}/api/user/me`, { withCredentials: true });
         if (response.status === 200) {
           dispatch(userExists(response.data.user));
@@ -42,11 +43,13 @@ const App = () => {
         if (error.response && error.response.status === 401) {
           dispatch(userNotExists());
         }
+      }finally{
+        setLoading(false);
       }
     }
 
     checkUser();
-  }, [user]);
+  }, [dispatch]);
 
 
   return loader ? <LayoutLoader /> : (
@@ -54,8 +57,8 @@ const App = () => {
       <Suspense fallback={<LayoutLoader />}>
         <Routes>
           {/* if user exist then only u can access below routes */}
-          <Route element={<SocketProvider><ProtectRoute user={user} /></SocketProvider>}>
-            <Route path='/' element={<Home />} />
+          <Route element={<SocketProvider><ProtectRoute loading={loader} user={user} /></SocketProvider>}>
+            <Route index path='/' element={<Home />} />
             <Route path='/chat/:chatId' element={<Chat />} />
             <Route path='/groups' element={<Groups />} />
           </Route>

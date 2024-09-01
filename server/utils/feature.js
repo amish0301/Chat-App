@@ -1,9 +1,12 @@
-const { getBase64 } = require("../lib/helper");
+const { getBase64, getSockets } = require("../lib/helper");
 const cloudinary = require("cloudinary").v2;
 const { v4: uuid_v4 } = require("uuid");
 
 const emitEvent = (req, event, users, data) => {
-  console.log("Emitting Event", event);
+  const userSockets = getSockets(users);
+  let io = req.app.get("io");
+  io.to(userSockets).emit(event, data);
+  // console.log("Emitting Event", event);
 };
 
 const deleteFilesFromCloudnary = async (pIds) => {};

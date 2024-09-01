@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import Header from './Header'
 import Title from '../shared/Title';
 import { Drawer, Grid, Skeleton } from '@mui/material';
@@ -8,8 +8,10 @@ import Profile from '../Profile'
 import { useMyChatQuery } from '../../redux/apis/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setIsMobile } from '../../redux/reducers/misc';
-import { useXErrors } from '../../hooks/hook';
+import { useSocketEvents, useXErrors } from '../../hooks/hook';
 import { getSocket } from '../../socket';
+import { NEW_MESSAGE_ALERT, NEW_REQUEST } from '../../constants/events';
+import { incrementNotificationCount } from '../../redux/reducers/chat';
 
 const AppLayout = () => (WrappedComponent) => {
     return (props) => {
@@ -29,6 +31,15 @@ const AppLayout = () => (WrappedComponent) => {
 
         // for errors
         useXErrors([{ isError, error }]);
+
+        // for showing notifications on appLayout
+        const newMessageAlertHandler = useCallback(() => { }, [])
+
+        const newRequestAlertHandler = useCallback(() => {
+            dispatch(incrementNotificationCount());
+        }, [dispatch]);
+        const eventHandler = { [NEW_MESSAGE_ALERT]: newMessageAlertHandler, [NEW_REQUEST]: newRequestAlertHandler };
+        useSocketEvents(socket, eventHandler);
 
         const handleDeleteChat = (e, _id, groupChat) => {
             e.preventDefault();

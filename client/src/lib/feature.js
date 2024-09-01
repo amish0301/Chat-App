@@ -1,7 +1,7 @@
 import moment from "moment";
 
 const fileFormat = (url = "") => {
-  const fileExt = url.split(".").pop();
+  const fileExt = url?.split(".").pop();
   if (fileExt === "mp4" || fileExt === "webm" || fileExt === "ogg")
     return "video";
   if (fileExt === "mp3" || fileExt === "wav") return "audio";
@@ -17,7 +17,8 @@ const fileFormat = (url = "") => {
 };
 
 const transformImage = (url = "", width = 100) => {
-  return url;
+  const newUrl = url?.replace('upload/', 'upload/dpr_auto/w_' + width + '/');
+  return newUrl;
 };
 
 const getLast7Days = () => {

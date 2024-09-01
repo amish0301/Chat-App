@@ -26,6 +26,7 @@ const Chat = ({ chatId }) => {
   const [fileMenuAnchor, setFileMenuAnchor] = useState(null);
 
   const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId });
+  
   const members = chatDetails.data?.chat?.members;
 
   // fetching old messages
@@ -43,11 +44,21 @@ const Chat = ({ chatId }) => {
   }
 
   const newMessages = useCallback((data) => {
+    // append message only when chatId matches
+    if(data.chatId !== chatId) return;
     setMessages(prev => ([...prev, data.message]));
   }, []);
-
   const eventHandler = { [NEW_MESSAGE]: newMessages };
   useSocketEvents(socket, eventHandler);
+
+  // fetching messages for a specific chat
+  useEffect(() => {
+    if (chatId) {
+      setMessages([]);
+      setPage(1);
+    }
+  }, [chatId]);
+
 
   // ********** Need some fixes in below useXErrors **************
   // useXErrors(errors);
@@ -56,7 +67,6 @@ const Chat = ({ chatId }) => {
   const { data: oldMessages, setData: setOldMessages } = useInfiniteScrollTop(containerRef, oldMessagesChunk.data?.totalPages, page, setPage, oldMessagesChunk.data?.messages);
 
   const allMessaeges = [...oldMessages, ...messages];
-
 
   // FILE MENU LOGIC:
   const handleFileMenu = (e) => {
@@ -89,7 +99,7 @@ const Chat = ({ chatId }) => {
         </Stack>
       </form>
 
-      <FileMenu anchorE1={fileMenuAnchor} />
+      <FileMenu anchorE1={fileMenuAnchor} chatId={chatId}/>
     </ Fragment>
   )
 }

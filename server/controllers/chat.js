@@ -3,11 +3,16 @@ const { Chat } = require("../models/chat");
 const { User } = require("../models/user");
 const { Message } = require("../models/message");
 const { getOtherMember } = require("../lib/helper");
-const { emitEvent, deleteFilesFromCloudnary } = require("../utils/feature");
+const {
+  emitEvent,
+  deleteFilesFromCloudnary,
+  uploadFilesToCloudinary,
+} = require("../utils/feature");
 const {
   ALERT,
   REFETCH_CHAT,
   NEW_MESSAGE_ALERT,
+  NEW_MESSAGE,
 } = require("../constants/events");
 const { attachmentsMulter } = require("../middlewares/multer");
 
@@ -197,20 +202,21 @@ const leaveGroup = TryCatch(async (req, res, next) => {
 
 const sendAttachments = TryCatch(async (req, res, next) => {
   const { chatId } = req.body;
-  
+
   const [chat, sender] = await Promise.all([
     Chat.findById(chatId),
     User.findById(req.userId, "name"),
   ]);
-  
+
   if (!chat) return next(new ErrorHandler("Chat not found", 404));
-  
+
   const files = req.files || [];
   if (files.length < 1) return next(new ErrorHandler("No file Choosen", 400));
-  if(files.length > 15) return next(new ErrorHandler("Can't send more than 15 files", 400));
+  if (files.length > 15)
+    return next(new ErrorHandler("Can't send more than 15 files", 400));
 
   // Upload files here
-  const attachments = [];
+  const attachments = await uploadFilesToCloudinary(files);
 
   const messageForDB = {
     content: "",
@@ -229,10 +235,12 @@ const sendAttachments = TryCatch(async (req, res, next) => {
 
   const message = await Message.create(messageForDB);
 
-  emitEvent(req, NEW_ATTACHMENT, chat.members, {
+  emitEvent(req, NEW_MESSAGE, chat.members, {
     message: messageForRealTime,
     chatId,
   });
+
+  // inform all the members of the chat
   emitEvent(req, NEW_MESSAGE_ALERT, chat.members, { chatId });
 
   return res.status(200).json({ success: true, message });

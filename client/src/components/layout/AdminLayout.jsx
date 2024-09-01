@@ -85,9 +85,9 @@ const AdminLayout = ({ children }) => {
     const handleMobile = () => {
         setIsMobile(!isMobile);
     }
-    const hadnleClose = () => setIsMobile(false);
+    const handleClose = () => setIsMobile(false);
 
-    if(!isAdmin) return <Navigate to={'/admin'}/>
+    if(!isAdmin) return <Navigate to={'/admin'} replace/>
 
     return (
         <Grid container minHeight={'100vh'}>
@@ -103,7 +103,7 @@ const AdminLayout = ({ children }) => {
                 {children}
             </Grid>
 
-            <Drawer open={isMobile} onClose={hadnleClose}>
+            <Drawer open={isMobile} onClose={handleClose}>
                 <SideBar w={'50vw'} />
             </Drawer>
         </Grid>

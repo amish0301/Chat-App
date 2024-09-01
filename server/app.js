@@ -16,6 +16,7 @@ require("dotenv").config({ path: "./.env" });
 const userRoutes = require("./routes/user");
 const chatRoutes = require("./routes/chat");
 const adminRoutes = require("./routes/admin");
+const path = require("path");
 
 // Initialisations
 const mongouri = process.env.MONGODB_URL;
@@ -41,15 +42,22 @@ const io = new Server(server, {
   cors: corsOptions,
 });
 
+// assigning io to use across app
+app.set("io", io);
+
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
+app.use(express.static(path.join(__dirname, "build")));
 
 // Routes
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/admin", adminRoutes);
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'))
+})
 
 // Middleware for Socket
 io.use((socket, next) => {
@@ -65,7 +73,7 @@ io.on("connection", (socket) => {
   // console.log("User Connected", socket.id);
   const user = socket.user;
 
-  // when user connect i'll map socket id with user id
+  // when user connect map user_id with socket_id
   userSocketIDs.set(user._id.toString(), socket.id);
 
   socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {

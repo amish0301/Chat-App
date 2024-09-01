@@ -1,13 +1,12 @@
 import React, { Suspense, lazy, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { Box, AppBar, Toolbar, Typography, IconButton, Tooltip, Backdrop } from '@mui/material'
+import { Box, AppBar, Toolbar, Typography, IconButton, Tooltip, Backdrop, Badge } from '@mui/material'
 import { orange } from '../styles/color'
 import MenuIcon from '@mui/icons-material/Menu';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import AddIcon from '@mui/icons-material/Add';
 import GroupIcon from '@mui/icons-material/Group';
 import LogoutIcon from '@mui/icons-material/Logout';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import axios from 'axios';
 import { serverURI } from '../../utils/config';
@@ -15,15 +14,29 @@ import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { userNotExists } from '../../redux/reducers/auth';
 import { setIsSearch, setIsMobile, setIsNewGroup, setIsNotification } from '../../redux/reducers/misc';
+import { resetNotificationCount } from '../../redux/reducers/chat';
 
 const SearchDialog = lazy(() => import('../dialogs/SearchDialog'));
 const Notification = lazy(() => import('../dialogs/Notification'));
 const NewGroup = lazy(() => import('../dialogs/NewGroup'));
 
+const IconBtn = ({ title, icon, onClick, value }) => {
+    return (
+        <Tooltip title={title}>
+            <IconButton color="inherit" onClick={onClick} size='large'>
+                {
+                    value ? <Badge badgeContent={value} color="error"><NotificationsIcon /></Badge> : icon
+                }
+            </IconButton>
+        </Tooltip>
+    );
+}
+
 const Header = () => {
 
     const dispatch = useDispatch();
     const { isSearch, isNewGroup, isNotification } = useSelector(state => state.utility);
+    const { notificationCount } = useSelector(state => state.chat);
 
     const handleMobile = () => dispatch(setIsMobile(true));
     const openSearch = () => dispatch(setIsSearch(true));
@@ -32,7 +45,8 @@ const Header = () => {
     const openNotification = () => {
         if (isNotification) {
             dispatch(setIsNotification(false));
-        }else {
+            dispatch(resetNotificationCount());
+        } else {
             dispatch(setIsNotification(true));
         }
     }
@@ -64,31 +78,11 @@ const Header = () => {
                         </Box>
                         <Box sx={{ flexGrow: 1 }} />
                         <Box>
-                            <Tooltip title={"Search"}>
-                                <IconButton color='inherit' size='large' onClick={openSearch}>
-                                    <PersonSearchIcon />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title={"New Group"}>
-                                <IconButton color='inherit' size='large' onClick={openNewGroup}>
-                                    <AddIcon />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title={"Manage Groups"}>
-                                <IconButton color='inherit' size='large' onClick={navigateToGroup}>
-                                    <GroupIcon />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title={"Notifications"}>
-                                <IconButton color='inherit' size='large' onClick={openNotification}>
-                                    {isNotification ? <NotificationsIcon /> : <NotificationsNoneIcon />}
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title={"Logout"}>
-                                <IconButton color='inherit' size='large' onClick={logoutHandler}>
-                                    <LogoutIcon />
-                                </IconButton>
-                            </Tooltip>
+                            <IconBtn title={"Search"} icon={<PersonSearchIcon />} onClick={openSearch} />
+                            <IconBtn title={"New Group"} icon={<AddIcon />} onClick={openNewGroup} />
+                            <IconBtn title={"My Groups"} icon={<GroupIcon />} onClick={navigateToGroup} />
+                            <IconBtn title={"Notifications"} icon={<NotificationsIcon />} value={notificationCount} onClick={openNotification} />
+                            <IconBtn title={"Logout"} icon={<LogoutIcon />} onClick={logoutHandler} />
                         </Box>
                     </Toolbar>
                 </AppBar>

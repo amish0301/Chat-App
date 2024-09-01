@@ -39,7 +39,7 @@ const Login = () => {
         const config = {
             withCredentials: true,
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "application/json"
             }
         };
 
@@ -49,7 +49,7 @@ const Login = () => {
                 password: password.value,
             }, config);
 
-            await dispatch(userExists(data.user));
+            dispatch(userExists(data.user));
             toast.success(data.message);
         } catch (error) {
             console.log(error?.response?.data?.message);
