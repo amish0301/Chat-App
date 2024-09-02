@@ -8,9 +8,11 @@ const { Server } = require("socket.io");
 const { userSocketIDs } = require("./constants/data");
 const { NEW_MESSAGE, NEW_MESSAGE_ALERT } = require("./constants/events");
 const { getSockets } = require("./lib/helper");
-const { Message } = require("./models/message");
+const Message = require("./models/message");
 const cloudinary = require("cloudinary").v2;
 const { socketAuthenticater } = require("./middlewares/auth");
+const { v4: uuid } = require("uuid");
+
 require("dotenv").config({ path: "./.env" });
 
 const userRoutes = require("./routes/user");
@@ -55,9 +57,9 @@ app.use(express.static(path.join(__dirname, "build")));
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/admin", adminRoutes);
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'))
-})
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
 
 // Middleware for Socket
 io.use((socket, next) => {
@@ -74,15 +76,17 @@ io.on("connection", (socket) => {
   const user = socket.user;
 
   // when user connect map user_id with socket_id
-  userSocketIDs.set(user._id.toString(), socket.id);
+  userSocketIDs.set(user?._id.toString(), socket.id);
 
+  // When new message will be send in chat, below listener will be triggered
+  // Storing message in DB
   socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
     const messageForRealtime = {
       content: message,
-      _id: "asdasdsadaddsadas",
+      _id: uuid(),
       sender: {
-        _id: user._id,
-        name: user.name,
+        _id: user?._id,
+        name: user?.name,
       },
       chat: chatId,
       createdAt: new Date().toISOString(),
@@ -90,19 +94,26 @@ io.on("connection", (socket) => {
 
     const messageForDB = {
       content: message,
-      sender: user._id,
+      sender: user?._id,
       chat: chatId,
     };
 
     // Sockets of all members in a Particular Chat
     const membersSocket = getSockets(members);
-    io.to([...membersSocket]).emit(NEW_MESSAGE, {
+
+    // Sending notification to all members associated with chatId to client side
+    io.to(membersSocket).emit(NEW_MESSAGE, {
       chatId,
       message: messageForRealtime,
     });
-    io.to([...membersSocket]).emit("NEW_MESSAGE_ALERT", { chatId });
 
-    await Message.create(messageForDB);
+    io.to(membersSocket).emit("NEW_MESSAGE_ALERT", { chatId });
+
+    try {
+      await Message.create(messageForDB);
+    } catch (error) {
+      throw new Error(error);
+    }
   });
 
   socket.on("disconnect", () => {

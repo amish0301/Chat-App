@@ -21,7 +21,6 @@ const AppLayout = () => (WrappedComponent) => {
 
         // Sockets
         const socket = getSocket();
-        // console.log(socket);
 
         const { isMobile } = useSelector(state => state.utility);
         const { user } = useSelector(state => state.auth);
@@ -54,7 +53,7 @@ const AppLayout = () => (WrappedComponent) => {
             <>
                 <Title />
                 <Header />
-                <Grid container height={"calc(100vh - 4vh)"}>
+                <Grid container height={"calc(100vh - 4rem)"}>
                     <Grid item sm={4} md={3} sx={{ display: { xs: 'none', sm: 'block' } }} height={"100%"}>
                         {
                             isLoading ? (<Skeleton />) : (<ChatList chats={data?.chats} chatId={chatId} newMessageAlert={[{ chatId, count: 2 }]} onlineUsers={['2', '3', '4']} handleDeleteChat={handleDeleteChat} />)
@@ -63,7 +62,7 @@ const AppLayout = () => (WrappedComponent) => {
                     <Grid item xs={12} sm={8} md={5} lg={6} height={"100%"}>
                         <WrappedComponent {...props} chatId={chatId} />
                     </Grid>
-                    <Grid item md={4} lg={3} sx={{ display: { xs: 'none', md: 'block' }, padding: '1rem', bgcolor: 'rgba(0,0,0,0.5)' }} height={"100%"}>
+                    <Grid item md={4} lg={3} sx={{ display: { xs: 'none', md: 'block' }, padding: '1rem', bgcolor: '#c06c84' }} height={"100%"}>
                         <Profile user={user} />
                     </Grid>
                 </Grid>
