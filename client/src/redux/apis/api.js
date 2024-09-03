@@ -80,6 +80,14 @@ const api = createApi({
       }),
     }),
 
+    deleteMessage: builder.mutation({
+      query: (data) => ({
+        url: `/chat/message/${data.chatId}/${data.messageId}`,
+        method: "DELETE",
+        credentials: "include",
+      }),
+    })
+
   }),
 });
 
@@ -93,4 +101,5 @@ export const {
   useChatDetailsQuery,
   useGetMessagesQuery,
   useSendAttachmentsMutation,
+  useDeleteMessageMutation
 } = api;

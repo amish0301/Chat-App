@@ -12,6 +12,7 @@ const {
   renameGroup,
   deleteChat,
   getMessages,
+  deleteMessage,
 } = require("../controllers/chat");
 const { attachmentsMulter } = require("../middlewares/multer");
 const {
@@ -42,6 +43,7 @@ router.post(
 
 // Get messages
 router.get("/message/:id", chatIdValidator(), validateHandler, getMessages);
+router.delete('/message/:chatId/:messageId', deleteMessage)
 
 // Get chat Details and Manipulate with chat
 router

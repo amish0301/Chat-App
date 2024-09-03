@@ -59,10 +59,11 @@ const AppLayout = () => (WrappedComponent) => {
                             isLoading ? (<Skeleton />) : (<ChatList chats={data?.chats} chatId={chatId} newMessageAlert={[{ chatId, count: 2 }]} onlineUsers={['2', '3', '4']} handleDeleteChat={handleDeleteChat} />)
                         }
                     </Grid>
-                    <Grid item xs={12} sm={8} md={5} lg={6} height={"100%"}>
+                    {/* for showing profile change below grid with for md = 5 & lg = 6 */}
+                    <Grid item xs={12} sm={8} md={9} lg={9} height={"100%"}>
                         <WrappedComponent {...props} chatId={chatId} />
                     </Grid>
-                    <Grid item md={4} lg={3} sx={{ display: { xs: 'none', md: 'block' }, padding: '1rem', bgcolor: '#c06c84' }} height={"100%"}>
+                    <Grid item md={4} lg={3} sx={{ display: { xs: 'none', md: 'none' }, padding: '1rem', bgcolor: '#c06c84' }} height={"100%"}>
                         <Profile user={user} />
                     </Grid>
                 </Grid>

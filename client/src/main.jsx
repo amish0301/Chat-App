@@ -12,7 +12,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <HelmetProvider>
         <CssBaseline />
         {/* wrapping in a div because when we rightclick anywhere through out are app nothing will happen */}
-        <div onContextMenu={e => e.preventDefault()}>
+        <div >
           <App />
         </div>
       </HelmetProvider>

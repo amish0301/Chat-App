@@ -1,7 +1,7 @@
 const { TryCatch, ErrorHandler } = require("../utils/ErrorHandler");
 const { Chat } = require("../models/chat");
 const { User } = require("../models/user");
-const { Message } = require("../models/message");
+const Message = require("../models/message");
 const { getOtherMember } = require("../lib/helper");
 const {
   emitEvent,
@@ -340,7 +340,7 @@ const getMessages = TryCatch(async (req, res, next) => {
 
   if (!chat) return next(new ErrorHandler("Chat not found", 404));
 
-  if (!chat.members.includes(req.user.toString()))
+  if (!chat.members.includes(req.userId.toString()))
     return next(
       new ErrorHandler("You are not allowed to access this chat", 403)
     );
@@ -363,6 +363,23 @@ const getMessages = TryCatch(async (req, res, next) => {
   });
 });
 
+const deleteMessage = TryCatch(async (req, res, next) => {
+  const { chatId, messageId } = req.params;
+
+  const chat = await Chat.findById(chatId);
+  if (!chat) return next(new ErrorHandler("Chat not found", 404));
+
+  const message = await Message.findById(messageId);
+  if(!message) return next(new ErrorHandler("Message not found", 404));
+
+  if(message.sender !== req.userId) return next(new ErrorHandler("You are not authorized to delete this message", 403));
+
+  // delete message
+  await Message.findByIdAndDelete(messageId);
+
+  return res.status(200).json({ success: true, message: "Message deleted" });
+});
+
 module.exports = {
   newGroupChat,
   getMyChats,
@@ -375,4 +392,5 @@ module.exports = {
   renameGroup,
   deleteChat,
   getMessages,
+  deleteMessage
 };
