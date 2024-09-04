@@ -9,10 +9,6 @@ const initialState = {
   isFileMenu: false,
   isDeleteMenu: false,
   uploadingLoader: false,
-  selecedDeleteChat: {
-    chatId: "",
-    groupChat: false,
-  },
 };
 
 const utilitySlice = createSlice({
@@ -43,9 +39,6 @@ const utilitySlice = createSlice({
     setUploadingLoader: (state, action) => {
       state.uploadingLoader = action.payload;
     },
-    setSelectedDeleteChat: (state, action) => {
-      state.selecedDeleteChat = action.payload;
-    },
   },
 });
 
@@ -59,5 +52,4 @@ export const {
   setIsFileMenu,
   setIsDeleteMenu,
   setUploadingLoader,
-  setSelectedDeleteChat,
 } = utilitySlice.actions;

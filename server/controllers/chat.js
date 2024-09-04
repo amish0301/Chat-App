@@ -372,7 +372,7 @@ const deleteMessage = TryCatch(async (req, res, next) => {
   const message = await Message.findById(messageId);
   if(!message) return next(new ErrorHandler("Message not found", 404));
 
-  if(message.sender !== req.userId) return next(new ErrorHandler("You are not authorized to delete this message", 403));
+  if(message.sender.toString() !== req.userId.toString()) return next(new ErrorHandler("You are not authorized to delete this message", 403));
 
   // delete message
   await Message.findByIdAndDelete(messageId);

@@ -53,7 +53,7 @@ const api = createApi({
 
     chatDetails: builder.query({
       query: ({ chatId, populate = false }) => {
-      let url = `/chat/${chatId}`;
+        let url = `/chat/${chatId}`;
         if (populate) url += "?populate=true";
         return {
           url,
@@ -81,13 +81,12 @@ const api = createApi({
     }),
 
     deleteMessage: builder.mutation({
-      query: (data) => ({
-        url: `/chat/message/${data.chatId}/${data.messageId}`,
+      query: ({ chatId, messageId }) => ({
+        url: `/chat/message/${chatId}/${messageId}`,
         method: "DELETE",
         credentials: "include",
       }),
-    })
-
+    }),
   }),
 });
 
@@ -101,5 +100,5 @@ export const {
   useChatDetailsQuery,
   useGetMessagesQuery,
   useSendAttachmentsMutation,
-  useDeleteMessageMutation
+  useDeleteMessageMutation,
 } = api;

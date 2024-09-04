@@ -11,7 +11,6 @@ import { NEW_MESSAGE } from '../constants/events';
 import { useChatDetailsQuery, useDeleteMessageMutation, useGetMessagesQuery } from '../redux/apis/api';
 import { useSocketEvents, useXErrors } from '../hooks/hook';
 import { useDispatch, useSelector } from 'react-redux';
-// import useInfiniteScrollTop from '../hooks/infiniteScrollTop';
 import { useInfiniteScrollTop } from '6pp';
 import { setIsFileMenu } from '../redux/reducers/misc';
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +19,8 @@ const Chat = ({ chatId }) => {
   const socket = getSocket();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user } = useSelector(state => state.auth)
+  const { user } = useSelector(state => state.auth);
+  const [deleteMessageRequest] = useDeleteMessageMutation();
 
   const containerRef = useRef(null);
   const bottomRef = useRef(null);
@@ -99,7 +99,7 @@ const Chat = ({ chatId }) => {
 
   useEffect(() => {
     if (bottomRef.current)
-      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+      bottomRef.current.scrollIntoView({ behavior: "smooth" })
   }, [messages]);
 
   useEffect(() => {
@@ -162,11 +162,16 @@ const Chat = ({ chatId }) => {
 
   useXErrors(errors);
 
-  const deleteMessage = (id) => {
-    // delete chat in database
-    useDeleteMessageMutation({ chatId, messageId: id });
-    setMessages(prev => prev.filter(msg => msg._id !== id));
-  }
+  const handleDeleteMessage = async (messageId) => {
+    try {
+      await deleteMessageRequest({ chatId, messageId }).unwrap();
+
+      // update the Local state of messages
+      setOldMessages((prev) => prev.filter((msg) => msg._id !== messageId));
+    } catch (error) {
+      throw error;
+    }
+  };
 
   const allMessages = [...oldMessages, ...messages];
 
@@ -177,7 +182,7 @@ const Chat = ({ chatId }) => {
       <Stack ref={containerRef} boxSizing={'border-box'} padding={'1rem'} spacing={'1rem'} bgcolor={grayColor} height={'90%'} sx={{ overflowX: 'hidden', overflowY: 'auto' }}>
         {/* messages */}
         {allMessages?.map((msg) => (
-          <MessageComponent key={msg._id} message={msg} user={user} deleteMessage={deleteMessage} />
+          <MessageComponent key={msg._id} message={msg} user={user} deleteMessage={handleDeleteMessage} />
         ))}
         <div ref={bottomRef} />
       </Stack>
