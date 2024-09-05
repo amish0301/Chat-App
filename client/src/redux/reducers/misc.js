@@ -9,6 +9,7 @@ const initialState = {
   isFileMenu: false,
   isDeleteMenu: false,
   uploadingLoader: false,
+  showEmojiPicker: false,
 };
 
 const utilitySlice = createSlice({
@@ -39,6 +40,9 @@ const utilitySlice = createSlice({
     setUploadingLoader: (state, action) => {
       state.uploadingLoader = action.payload;
     },
+    setShowEmojiPicker: (state, action) => {
+      state.showEmojiPicker = action.payload;
+    },
   },
 });
 
@@ -52,4 +56,5 @@ export const {
   setIsFileMenu,
   setIsDeleteMenu,
   setUploadingLoader,
+  setShowEmojiPicker
 } = utilitySlice.actions;

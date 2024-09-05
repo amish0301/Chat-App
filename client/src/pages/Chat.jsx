@@ -3,6 +3,8 @@ import AppLayout from '../components/layout/AppLayout';
 import { IconButton, Skeleton, Stack, Tooltip } from '@mui/material';
 import { grayColor, orange } from '../components/styles/color';
 import { AttachFile as AttachFileIcon, Send as SendIcon } from '@mui/icons-material';
+import EmojiIcon from '@mui/icons-material/EmojiEmotions';
+import EmojiOutline from '@mui/icons-material/EmojiEmotionsOutlined';
 import { InputBox } from '../components/styles/StyledComponents';
 import FileMenu from '../components/dialogs/FileMenu';
 import MessageComponent from '../components/shared/MessageComponent';
@@ -12,19 +14,22 @@ import { useChatDetailsQuery, useDeleteMessageMutation, useGetMessagesQuery } fr
 import { useSocketEvents, useXErrors } from '../hooks/hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { useInfiniteScrollTop } from '6pp';
-import { setIsFileMenu } from '../redux/reducers/misc';
+import { setIsFileMenu, setShowEmojiPicker } from '../redux/reducers/misc';
 import { useNavigate } from 'react-router-dom';
+import Picker from 'emoji-picker-react';
 
 const Chat = ({ chatId }) => {
   const socket = getSocket();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector(state => state.auth);
+  const { showEmojiPicker } = useSelector(state => state.utility);
   const [deleteMessageRequest] = useDeleteMessageMutation();
 
   const containerRef = useRef(null);
   const bottomRef = useRef(null);
 
+  // States
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [page, setPage] = useState(1);
@@ -83,6 +88,10 @@ const Chat = ({ chatId }) => {
     socket.emit(NEW_MESSAGE, { chatId, members, message });
     setMessage("");
   };
+
+  const handleEmojiOnkeyDown = (e) => {
+    if(e.key === 'Escape') dispatch(setShowEmojiPicker(!showEmojiPicker));
+  }
 
   useEffect(() => {
     // socket.emit(CHAT_JOINED, { userId: user._id, members });
@@ -186,16 +195,25 @@ const Chat = ({ chatId }) => {
         ))}
         <div ref={bottomRef} />
       </Stack>
-      <form style={{ height: '10%' }} onSubmit={onSendMessage}>
-        <Stack direction={'row'} height={'100%'} padding={'.5rem 1.5rem'} alignItems={'center'} position={'relative'}>
-          <Tooltip title="Attach Files">
-            <IconButton sx={{ rotate: '30deg', position: 'absolute', left: '1.2rem' }} onClick={handleFileMenu}>
-              <AttachFileIcon />
+      <form style={{ height: '10%' }} onSubmit={onSendMessage} onKeyDown={handleEmojiOnkeyDown}>
+        <Stack direction={'row'} height={'100%'} padding={'.5rem 1rem'} alignItems={'center'} position={'relative'}>
+          {showEmojiPicker && <div style={{ position: 'absolute', bottom: '100%', left: '1rem' }}>
+            <Picker onEmojiClick={(e) => setMessage(message + e.emoji)} theme='dark' />
+          </div>}
+
+          <Tooltip title="Emoji">
+            <IconButton sx={{ marginRight: '.5rem' }} onClick={() => dispatch(setShowEmojiPicker(!showEmojiPicker))}>
+              {showEmojiPicker ? <EmojiIcon /> : <EmojiOutline />}
             </IconButton>
           </Tooltip>
 
-          <InputBox placeholder='Type Message Here...' value={message} onChange={(e) => setMessage(e.target.value)} className='chatFont' sx={{ "&:focus": { border: '2px solid black' }, width: '100%' }} />
-          <IconButton type='submit' disabled={!message.trim()} sx={{ bgcolor: orange, marginLeft: '1rem', padding: '0.5rem', color: 'white', "&:hover": { bgcolor: 'error.dark' }, rotate: '-30deg' }}>
+          <InputBox placeholder='Type Message Here...' value={message} onChange={(e) => setMessage(e.target.value)} className='chatFont' sx={{ width: '100%', paddingLeft: '5px'}} autoFocus={showEmojiPicker}/>
+          <Tooltip title="Attach Files">
+            <IconButton sx={{ rotate: '30deg', marginLeft: '.5rem' }} onClick={handleFileMenu}>
+              <AttachFileIcon />
+            </IconButton>
+          </Tooltip>
+          <IconButton type='submit' disabled={!message.trim()} sx={{ bgcolor: orange, marginLeft: '.5rem', padding: '0.5rem', color: 'white', "&:hover": { bgcolor: 'error.dark' }, rotate: '-30deg' }}>
             <SendIcon />
           </IconButton>
         </Stack>

@@ -1,9 +1,10 @@
 import { Box, Typography } from '@mui/material';
-import React, { memo, useState } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import moment from 'moment';
 import { fileFormat } from '../../lib/feature'
 import RenderAttachment from './RenderAttachment';
 import { useSelector } from 'react-redux';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const MessageComponent = ({ message, user, deleteMessage }) => {
   const { sender, content, attachments = [], createdAt } = message;
@@ -63,14 +64,19 @@ const MessageComponent = ({ message, user, deleteMessage }) => {
                 top: `${contextMenu.y}px`,
                 right: `${contextMenu.x}px`,
                 zIndex: 1000,
-                backgroundColor: 'green',
+                backgroundColor: '#1a1a1a',
                 padding: "5px 10px",
                 cursor: 'pointer',
                 borderRadius: "5px",
                 boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                minWidth: '170px',
               }}
+              className='contextMenu'
             >
-              <button onClick={handleDeleteMessage} style={{ cursor: "pointer" }}> 🗑️ Delete</button>
+              <button onClick={handleDeleteMessage} className='delete-message'>
+                <DeleteIcon style={{ marginRight: "5px" }} />
+                <span style={{ marginLeft: "5px", fontSize: '14px' }}>Delete Message</span>
+              </button>
             </div>
           )
         }

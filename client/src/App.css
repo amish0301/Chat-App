@@ -7,6 +7,7 @@
 
 ::-webkit-scrollbar {
     width: 10px;
+    scroll-behavior: smooth;
 }
 
 ::-webkit-scrollbar-track {
@@ -50,4 +51,20 @@
     bottom: 1rem;
     cursor: pointer;
     opacity: .8;
+}
+
+.delete-message {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  width: 100%;
+  color: white;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+}
+
+.contextMenu:hover {
+    background-color: blueviolet;
 }
