@@ -41,7 +41,7 @@ const Chat = ({ chatId }) => {
   const [userTyping, setUserTyping] = useState(false);
   const typingTimeout = useRef(null);
 
-  const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId });
+  const chatDetails = useChatDetailsQuery({ chatId }, { skip: !chatId });
 
   const oldMessagesChunk = useGetMessagesQuery({ chatId, page });
 
@@ -92,7 +92,7 @@ const Chat = ({ chatId }) => {
   };
 
   const handleEmojiOnkeyDown = (e) => {
-    if(e.key === 'Escape') dispatch(setShowEmojiPicker(!showEmojiPicker));
+    if (e.key === 'Escape') dispatch(setShowEmojiPicker(!showEmojiPicker));
   }
 
   useEffect(() => {
@@ -210,7 +210,7 @@ const Chat = ({ chatId }) => {
             </IconButton>
           </Tooltip>
 
-          <InputBox placeholder='Type Message Here...' value={message} onChange={messageOnChange} className='chatFont' sx={{ width: '100%', paddingLeft: '5px'}} autoFocus={showEmojiPicker}/>
+          <InputBox placeholder='Type Message Here...' value={message} onChange={messageOnChange} className='chatFont' sx={{ width: '100%', paddingLeft: '5px' }} autoFocus={showEmojiPicker} />
           <Tooltip title="Attach Files">
             <IconButton sx={{ rotate: '30deg', marginLeft: '.5rem' }} onClick={handleFileMenu}>
               <AttachFileIcon />

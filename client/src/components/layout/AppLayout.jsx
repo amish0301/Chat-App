@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setIsMobile } from '../../redux/reducers/misc';
 import { useSocketEvents, useXErrors } from '../../hooks/hook';
 import { getSocket } from '../../socket';
-import { NEW_MESSAGE_ALERT, NEW_REQUEST } from '../../constants/events';
+import { NEW_MESSAGE_ALERT, NEW_REQUEST, REFETCH_CHAT } from '../../constants/events';
 import { incrementNotificationCount, setNewMessagesAlert } from '../../redux/reducers/chat';
 import { getOrSaveFromStorage } from '../../lib/feature';
 
@@ -36,20 +36,24 @@ const AppLayout = () => (WrappedComponent) => {
 
         // Save state in LocalStorage
         useEffect(() => {
-            getOrSaveFromStorage({key: NEW_MESSAGE_ALERT, value: newMessagesAlert});
+            getOrSaveFromStorage({ key: NEW_MESSAGE_ALERT, value: newMessagesAlert });
         }, [newMessagesAlert])
 
-        // for showing notifications on appLayout
-        const newMessageAlertHandler = useCallback((data) => {
-            if(data.chatId === chatId) return;
+        // fetching if any notification available
+        const newMessageAlertListener = useCallback((data) => {
+            if (data.chatId === chatId) return;
             dispatch(setNewMessagesAlert(data.chatdId));
         }, [chatId])
 
-        const newRequestAlertHandler = useCallback(() => {
+        const newRequestAlertListener = useCallback(() => {
+            refetch();
+        }, [refetch]);
+
+        const refetchListener = useCallback(() => {
             dispatch(incrementNotificationCount());
         }, [dispatch]);
 
-        const eventHandler = { [NEW_MESSAGE_ALERT]: newMessageAlertHandler, [NEW_REQUEST]: newRequestAlertHandler };
+        const eventHandler = { [NEW_MESSAGE_ALERT]: newMessageAlertListener, [NEW_REQUEST]: newRequestAlertListener, [REFETCH_CHAT]: refetchListener };
         useSocketEvents(socket, eventHandler);
 
         const handleDeleteChat = (e, _id, groupChat) => {
