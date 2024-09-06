@@ -178,6 +178,8 @@ const getMyNotifications = TryCatch(async (req, res, next) => {
 const getMyFriends = TryCatch(async (req, res, next) => {
   const chatId = req.query.chatId;
 
+  if(!chatId) return next(new ErrorHandler("Chat Id Not Provided", 400));
+
   const chat = await Chat.find({
     members: req.userId,
     groupChat: false,

@@ -9,7 +9,7 @@ import { InputBox } from '../components/styles/StyledComponents';
 import FileMenu from '../components/dialogs/FileMenu';
 import MessageComponent from '../components/shared/MessageComponent';
 import { getSocket } from '../socket';
-import { NEW_MESSAGE, START_TYPING, STOP_TYPING } from '../constants/events';
+import { ALERT, NEW_MESSAGE, START_TYPING, STOP_TYPING } from '../constants/events';
 import { useChatDetailsQuery, useDeleteMessageMutation, useGetMessagesQuery } from '../redux/apis/api';
 import { useSocketEvents, useXErrors } from '../hooks/hook';
 import { useDispatch, useSelector } from 'react-redux';
