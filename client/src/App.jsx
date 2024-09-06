@@ -1,7 +1,7 @@
 import React, { Suspense, lazy, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ProtectRoute from './components/auth/ProtectRoute';
-import LayoutLoader from './components/layout/Loaders';
+import { LayoutLoader } from './components/layout/Loaders';
 import { serverURI } from './utils/config';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoading, userExists, userNotExists } from './redux/reducers/auth';
@@ -43,7 +43,7 @@ const App = () => {
         if (error.response && error.response.status === 401) {
           dispatch(userNotExists());
         }
-      }finally{
+      } finally {
         setLoading(false);
       }
     }

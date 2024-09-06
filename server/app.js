@@ -6,7 +6,12 @@ const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
 const { userSocketIDs } = require("./constants/data");
-const { NEW_MESSAGE, NEW_MESSAGE_ALERT } = require("./constants/events");
+const {
+  NEW_MESSAGE,
+  NEW_MESSAGE_ALERT,
+  START_TYPING,
+  STOP_TYPING
+} = require("./constants/events");
 const { getSockets } = require("./lib/helper");
 const Message = require("./models/message");
 const cloudinary = require("cloudinary").v2;
@@ -101,13 +106,14 @@ io.on("connection", (socket) => {
     // Sockets of all members in a Particular Chat
     const membersSocket = getSockets(members);
 
-    // Sending notification to all members associated with chatId to client side
+    // Notifying all members associated with chatId to client side
     io.to(membersSocket).emit(NEW_MESSAGE, {
       chatId,
       message: messageForRealtime,
     });
 
-    io.to(membersSocket).emit("NEW_MESSAGE_ALERT", { chatId });
+    // When new message is sent, alert all members associated with chatId
+    io.to(membersSocket).emit(NEW_MESSAGE_ALERT, { chatId });
 
     try {
       await Message.create(messageForDB);
@@ -115,6 +121,16 @@ io.on("connection", (socket) => {
       throw new Error(error);
     }
   });
+
+  socket.on(START_TYPING, ({ chatId, members }) => {
+    const membersSocket = getSockets(members);
+    io.to(membersSocket).emit(START_TYPING, { chatId });
+  });
+
+  socket.on(STOP_TYPING, ({chatId, members}) => {
+    const membersSocket = getSockets(members);
+    io.to(membersSocket).emit(STOP_TYPING, { chatId });
+  })
 
   socket.on("disconnect", () => {
     // console.log("User Disconnected", socket.id);

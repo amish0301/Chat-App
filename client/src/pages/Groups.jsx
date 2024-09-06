@@ -1,12 +1,15 @@
 import React, { Suspense, lazy, memo, useEffect, useState } from 'react'
 import { Backdrop, Box, Button, Drawer, Grid, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material'
-import { matBlack, bgGradiant } from '../components/styles/color'
+import { matBlack } from '../components/styles/color'
 import { Menu as MenuIcon, KeyboardBackspace as BackIcon, Edit as EditIcon, Done as DoneIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Link } from '../components/styles/StyledComponents';
 import AvatarCard from '../components/shared/AvatarCard';
 import { sampleUsers, samplechats } from '../utils/sampleData';
 import UserItem from '../components/shared/UserItem';
+import { useMyGroupsQuery } from '../redux/apis/api';
+import { useXErrors } from '../hooks/hook';
+import { GroupsLayoutLoader } from '../components/layout/Loaders';
 
 const ConfirmDeleteDialog = lazy(() => import('../components/dialogs/ConfirmDeleteDialog'));
 const AddMember = lazy(() => import('../components/dialogs/AddMember'));
@@ -14,7 +17,6 @@ const AddMember = lazy(() => import('../components/dialogs/AddMember'));
 const isAddMember = false;
 
 // **** SOLO Group Item ****
-
 const GroupItem = memo(({ group, chatId }) => {
   const { name, avatar, _id } = group;
 
@@ -31,7 +33,6 @@ const GroupItem = memo(({ group, chatId }) => {
 })
 
 // **** List Of Groups ****
-
 const GroupsList = ({ w = '100%', myGroups = [], chatId }) => {
   return (
     <Stack width={w} spacing={'1rem'} sx={{ bgcolor: '#ea7070', height: '100vh', overflow: 'auto' }}>
@@ -48,8 +49,10 @@ const Groups = () => {
   const navigate = useNavigate();
   const navigateBack = () => navigate('/');
   const chatId = useSearchParams()[0].get('group');
+  const myGroups = useMyGroupsQuery(); 
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const handleMobile = () => {
     setIsMobileMenuOpen(prev => !prev)
   };
@@ -60,12 +63,23 @@ const Groups = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [groupName, setGroupName] = useState("");
   const [groupNameUpdatedValue, setGroupNameUpdatedValue] = useState("");
+  const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false);
+
+  const errors = [
+    {
+      isError: myGroups.isError,
+      error: myGroups.error,
+    }
+  ]
+
+  // Error Handler
+  useXErrors(errors);
+
   const updateGroupName = () => {
     setIsEdit(false);
   }
 
   // Add OR Delete Member Handler 
-  const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false);
   const openConfirmDeleteHandler = () => {
     setConfirmDeleteDialog(true);
   };
@@ -141,7 +155,7 @@ const Groups = () => {
     </Stack>
   );
 
-  return (
+  return myGroups.isLoading ? <GroupsLayoutLoader /> : (
     <Grid container height={'100vh'}>
       <Grid item sx={{ display: { xs: 'none', sm: 'block' } }} sm={4}>
         <GroupsList myGroups={samplechats} chatId={chatId} />

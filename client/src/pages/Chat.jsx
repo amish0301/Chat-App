@@ -9,7 +9,7 @@ import { InputBox } from '../components/styles/StyledComponents';
 import FileMenu from '../components/dialogs/FileMenu';
 import MessageComponent from '../components/shared/MessageComponent';
 import { getSocket } from '../socket';
-import { NEW_MESSAGE } from '../constants/events';
+import { NEW_MESSAGE, START_TYPING, STOP_TYPING } from '../constants/events';
 import { useChatDetailsQuery, useDeleteMessageMutation, useGetMessagesQuery } from '../redux/apis/api';
 import { useSocketEvents, useXErrors } from '../hooks/hook';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,6 +17,8 @@ import { useInfiniteScrollTop } from '6pp';
 import { setIsFileMenu, setShowEmojiPicker } from '../redux/reducers/misc';
 import { useNavigate } from 'react-router-dom';
 import Picker from 'emoji-picker-react';
+import { removeNewMessagesAlert } from '../redux/reducers/chat';
+import { TypingLoader } from '../components/layout/Loaders';
 
 const Chat = ({ chatId }) => {
   const socket = getSocket();
@@ -35,9 +37,9 @@ const Chat = ({ chatId }) => {
   const [page, setPage] = useState(1);
   const [fileMenuAnchor, setFileMenuAnchor] = useState(null);
 
-  // const [IamTyping, setIamTyping] = useState(false);
-  // const [userTyping, setUserTyping] = useState(false);
-  // const typingTimeout = useRef(null);
+  const [IamTyping, setIamTyping] = useState(false);
+  const [userTyping, setUserTyping] = useState(false);
+  const typingTimeout = useRef(null);
 
   const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId });
 
@@ -58,21 +60,21 @@ const Chat = ({ chatId }) => {
 
   const members = chatDetails?.data?.chat?.members;
 
-  // const messageOnChange = (e) => {
-  //   setMessage(e.target.value);
+  const messageOnChange = (e) => {
+    setMessage(e.target.value);
 
-  //   if (!IamTyping) {
-  //     socket.emit(START_TYPING, { members, chatId });
-  //     setIamTyping(true);
-  //   }
+    if (!IamTyping) {
+      socket.emit(START_TYPING, { members, chatId });
+      setIamTyping(true);
+    }
 
-  //   if (typingTimeout.current) clearTimeout(typingTimeout.current);
+    if (typingTimeout.current) clearTimeout(typingTimeout.current);
 
-  //   typingTimeout.current = setTimeout(() => {
-  //     socket.emit(STOP_TYPING, { members, chatId });
-  //     setIamTyping(false);
-  //   }, [2000]);
-  // };
+    typingTimeout.current = setTimeout(() => {
+      socket.emit(STOP_TYPING, { members, chatId });
+      setIamTyping(false);
+    }, [2000]);
+  };
 
   const handleFileMenu = (e) => {
     dispatch(setIsFileMenu(true));
@@ -95,8 +97,7 @@ const Chat = ({ chatId }) => {
 
   useEffect(() => {
     // socket.emit(CHAT_JOINED, { userId: user._id, members });
-    // dispatch(removeNewMessagesAlert(chatId));
-
+    dispatch(removeNewMessagesAlert(chatId));
     return () => {
       setMessages([]);
       setMessage("");
@@ -123,50 +124,52 @@ const Chat = ({ chatId }) => {
     [chatId]
   );
 
-  // const startTypingListener = useCallback(
-  //   (data) => {
-  //     if (data.chatId !== chatId) return;
+  const startTypingListener = useCallback(
+    (data) => {
+      if (data.chatId !== chatId) return;
+      setUserTyping(true);
+    },
+    [chatId]
+  );
 
-  //     setUserTyping(true);
-  //   },
-  //   [chatId]
-  // );
+  const stopTypingListener = useCallback(
+    (data) => {
+      if (data.chatId !== chatId) return;
+      setUserTyping(false);
+    },
+    [chatId]
+  );
 
-  // const stopTypingListener = useCallback(
-  //   (data) => {
-  //     if (data.chatId !== chatId) return;
-  //     setUserTyping(false);
-  //   },
-  //   [chatId]
-  // );
+  // Admin Message
+  const alertListener = useCallback(
+    (data) => {
+      if (data.chatId !== chatId) return;
 
-  // const alertListener = useCallback(
-  //   (data) => {
-  //     if (data.chatId !== chatId) return;
-  //     const messageForAlert = {
-  //       content: data.message,
-  //       sender: {
-  //         _id: "djasdhajksdhasdsadasdas",
-  //         name: "Admin",
-  //       },
-  //       chat: chatId,
-  //       createdAt: new Date().toISOString(),
-  //     };
+      const messageForAlert = {
+        content: data.message,
+        sender: {
+          _id: "djasdhajksdhasdsadasdas",
+          name: "Admin",
+        },
+        chat: chatId,
+        createdAt: new Date().toISOString(),
+      };
 
-  //     setMessages((prev) => [...prev, messageForAlert]);
-  //   },
-  //   [chatId]
-  // );
+      setMessages((prev) => [...prev, messageForAlert]);
+    },
+    [chatId]
+  );
 
   // console.log('oldMessages', oldMessages);
 
   const eventHandler = {
-    // [ALERT]: alertListener,
+    [ALERT]: alertListener,
     [NEW_MESSAGE]: newMessagesListener,
-    // [START_TYPING]: startTypingListener,
-    // [STOP_TYPING]: stopTypingListener,
+    [START_TYPING]: startTypingListener,
+    [STOP_TYPING]: stopTypingListener,
   };
 
+  // Event Listeners
   useSocketEvents(socket, eventHandler);
 
   useXErrors(errors);
@@ -193,6 +196,7 @@ const Chat = ({ chatId }) => {
         {allMessages?.map((msg) => (
           <MessageComponent key={msg._id} message={msg} user={user} deleteMessage={handleDeleteMessage} />
         ))}
+        {userTyping && <TypingLoader />}
         <div ref={bottomRef} />
       </Stack>
       <form style={{ height: '10%' }} onSubmit={onSendMessage} onKeyDown={handleEmojiOnkeyDown}>
@@ -200,14 +204,13 @@ const Chat = ({ chatId }) => {
           {showEmojiPicker && <div style={{ position: 'absolute', bottom: '100%', left: '1rem' }}>
             <Picker onEmojiClick={(e) => setMessage(message + e.emoji)} theme='dark' />
           </div>}
-
           <Tooltip title="Emoji">
             <IconButton sx={{ marginRight: '.5rem' }} onClick={() => dispatch(setShowEmojiPicker(!showEmojiPicker))}>
               {showEmojiPicker ? <EmojiIcon /> : <EmojiOutline />}
             </IconButton>
           </Tooltip>
 
-          <InputBox placeholder='Type Message Here...' value={message} onChange={(e) => setMessage(e.target.value)} className='chatFont' sx={{ width: '100%', paddingLeft: '5px'}} autoFocus={showEmojiPicker}/>
+          <InputBox placeholder='Type Message Here...' value={message} onChange={messageOnChange} className='chatFont' sx={{ width: '100%', paddingLeft: '5px'}} autoFocus={showEmojiPicker}/>
           <Tooltip title="Attach Files">
             <IconButton sx={{ rotate: '30deg', marginLeft: '.5rem' }} onClick={handleFileMenu}>
               <AttachFileIcon />

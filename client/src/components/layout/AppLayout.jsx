@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import Header from './Header'
 import Title from '../shared/Title';
 import { Drawer, Grid, Skeleton } from '@mui/material';
@@ -11,7 +11,8 @@ import { setIsMobile } from '../../redux/reducers/misc';
 import { useSocketEvents, useXErrors } from '../../hooks/hook';
 import { getSocket } from '../../socket';
 import { NEW_MESSAGE_ALERT, NEW_REQUEST } from '../../constants/events';
-import { incrementNotificationCount } from '../../redux/reducers/chat';
+import { incrementNotificationCount, setNewMessagesAlert } from '../../redux/reducers/chat';
+import { getOrSaveFromStorage } from '../../lib/feature';
 
 const AppLayout = () => (WrappedComponent) => {
     return (props) => {
@@ -24,6 +25,8 @@ const AppLayout = () => (WrappedComponent) => {
 
         const { isMobile } = useSelector(state => state.utility);
         const { user } = useSelector(state => state.auth);
+        const { newMessagesAlert } = useSelector(state => state.chat);
+
 
         // all below destructured data is provided by default RTK query
         const { isLoading, data, isError, error, refetch } = useMyChatQuery("");
@@ -31,12 +34,21 @@ const AppLayout = () => (WrappedComponent) => {
         // for errors
         useXErrors([{ isError, error }]);
 
+        // Save state in LocalStorage
+        useEffect(() => {
+            getOrSaveFromStorage({key: NEW_MESSAGE_ALERT, value: newMessagesAlert});
+        }, [newMessagesAlert])
+
         // for showing notifications on appLayout
-        const newMessageAlertHandler = useCallback(() => { }, [])
+        const newMessageAlertHandler = useCallback((data) => {
+            if(data.chatId === chatId) return;
+            dispatch(setNewMessagesAlert(data.chatdId));
+        }, [chatId])
 
         const newRequestAlertHandler = useCallback(() => {
             dispatch(incrementNotificationCount());
         }, [dispatch]);
+
         const eventHandler = { [NEW_MESSAGE_ALERT]: newMessageAlertHandler, [NEW_REQUEST]: newRequestAlertHandler };
         useSocketEvents(socket, eventHandler);
 
@@ -56,7 +68,7 @@ const AppLayout = () => (WrappedComponent) => {
                 <Grid container height={"calc(100vh - 4rem)"}>
                     <Grid item sm={4} md={3} sx={{ display: { xs: 'none', sm: 'block' } }} height={"100%"}>
                         {
-                            isLoading ? (<Skeleton />) : (<ChatList chats={data?.chats} chatId={chatId} newMessageAlert={[{ chatId, count: 2 }]} onlineUsers={['2', '3', '4']} handleDeleteChat={handleDeleteChat} />)
+                            isLoading ? (<Skeleton />) : (<ChatList chats={data?.chats} chatId={chatId} newMessagesAlert={newMessagesAlert} onlineUsers={['2', '3', '4']} handleDeleteChat={handleDeleteChat} />)
                         }
                     </Grid>
                     {/* for showing profile change below grid with for md = 5 & lg = 6 */}
@@ -71,7 +83,7 @@ const AppLayout = () => (WrappedComponent) => {
                 {
                     isLoading ? (<Skeleton />) : (
                         <Drawer open={isMobile} onClose={handleMobileClose}>
-                            <ChatList w='70vw' chats={data?.chats} chatId={chatId} newMessageAlert={[{ chatId, count: 2 }]} onlineUsers={['2', '3', '4']} handleDeleteChat={handleDeleteChat} />
+                            <ChatList w='70vw' chats={data?.chats} chatId={chatId} newMessagesAlert={newMessagesAlert} onlineUsers={['2', '3', '4']} handleDeleteChat={handleDeleteChat} />
                         </Drawer>
                     )
                 }

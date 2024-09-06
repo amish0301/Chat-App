@@ -1,4 +1,4 @@
-import { styled } from '@mui/material'
+import { Skeleton, styled } from '@mui/material'
 import { Link as LinkComponent } from 'react-router-dom';
 import { matBlack } from './color';
 
@@ -29,7 +29,7 @@ export const InputBox = styled("input")(
     height: 100%;
     border: none;
     outline: none;
-    padding: 0 2.2rem;
+    padding: 0 2rem;
     border-radius: 0.7rem;
     background-color: transparent;
     color: black;
@@ -59,4 +59,19 @@ export const CurveButton = styled('button')(
         background-color: rgba(0,0,0,0.8);
     }
     `
+);
+
+export const BouncingSkeleton = styled(Skeleton)(
+    `animation: bouncing 1s infinite;
+    @keyframes bouncing {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.3);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }`
 );
