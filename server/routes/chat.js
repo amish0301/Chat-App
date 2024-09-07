@@ -28,8 +28,8 @@ const {
 router.use(isAuthenticated);
 
 router.post("/new", newChatValidator(), validateHandler, newGroupChat);
-router.put("/add", addMemberValidator(), validateHandler, addMembers);
-router.put("/remove", removeMemberValidator(), validateHandler, removeMembers);
+router.put("/add-member", addMemberValidator(), validateHandler, addMembers);
+router.put("/remove-member", removeMemberValidator(), validateHandler, removeMembers);
 router.delete("/leave/:id", chatIdValidator(), validateHandler, leaveGroup);
 
 // Send Attachments in Message

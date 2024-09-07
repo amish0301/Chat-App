@@ -7,7 +7,7 @@ const ConfirmDeleteDialog = ({ open, handleClose, deleteHandler }) => {
             <DialogTitle>Confirm Delete</DialogTitle>
             <DialogContent>
                 <DialogContentText sx={{fontWeight: 'bolder'}}>
-                    Are you sure you want to `delete` this Group?
+                    Are you sure you want to <code>`delete`</code> this Group?
                 </DialogContentText>
             </DialogContent>
             <DialogActions>

@@ -3,11 +3,11 @@ import Header from './Header'
 import Title from '../shared/Title';
 import { Drawer, Grid, Skeleton } from '@mui/material';
 import ChatList from '../ChatList';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Profile from '../Profile'
 import { useMyChatQuery } from '../../redux/apis/api';
 import { useDispatch, useSelector } from 'react-redux';
-import { setIsMobile } from '../../redux/reducers/misc';
+import { setIsDeleteMenu, setIsMobile } from '../../redux/reducers/misc';
 import { useSocketEvents, useXErrors } from '../../hooks/hook';
 import { getSocket } from '../../socket';
 import { NEW_MESSAGE_ALERT, NEW_REQUEST, REFETCH_CHAT } from '../../constants/events';
@@ -19,6 +19,7 @@ const AppLayout = () => (WrappedComponent) => {
         const params = useParams();
         const chatId = params.chatId;
         const dispatch = useDispatch();
+        const navigate = useNavigate();
 
         // Sockets
         const socket = getSocket();
@@ -45,19 +46,21 @@ const AppLayout = () => (WrappedComponent) => {
             dispatch(setNewMessagesAlert(data.chatdId));
         }, [chatId])
 
-        const newRequestAlertListener = useCallback(() => {
-            refetch();
-        }, [refetch]);
-
-        const refetchListener = useCallback(() => {
+        const newRequestListener = useCallback(() => {
             dispatch(incrementNotificationCount());
         }, [dispatch]);
 
-        const eventHandler = { [NEW_MESSAGE_ALERT]: newMessageAlertListener, [NEW_REQUEST]: newRequestAlertListener, [REFETCH_CHAT]: refetchListener };
+        // refetching chat list for updated notification
+        const refetchListener = useCallback(() => {
+            refetch();
+            navigate("/");
+        }, [refetch, navigate]);
+
+        const eventHandler = { [NEW_MESSAGE_ALERT]: newMessageAlertListener, [NEW_REQUEST]: newRequestListener, [REFETCH_CHAT]: refetchListener };
         useSocketEvents(socket, eventHandler);
 
-        const handleDeleteChat = (e, _id, groupChat) => {
-            e.preventDefault();
+        const handleDeleteChat = (_id, groupChat) => {
+            dispatch(setIsDeleteMenu(true));
             console.log("deleted chat", _id, groupChat);
         }
 
@@ -72,7 +75,7 @@ const AppLayout = () => (WrappedComponent) => {
                 <Grid container height={"calc(100vh - 4rem)"}>
                     <Grid item sm={4} md={3} sx={{ display: { xs: 'none', sm: 'block' } }} height={"100%"}>
                         {
-                            isLoading ? (<Skeleton />) : (<ChatList chats={data?.chats} chatId={chatId} newMessagesAlert={newMessagesAlert} onlineUsers={['2', '3', '4']} handleDeleteChat={handleDeleteChat} />)
+                            isLoading ? (<Skeleton height={"100%"}/>) : (<ChatList chats={data?.chats} chatId={chatId} newMessagesAlert={newMessagesAlert} onlineUsers={['2', '3', '4']} handleDeleteChat={handleDeleteChat} />)
                         }
                     </Grid>
                     {/* for showing profile change below grid with for md = 5 & lg = 6 */}

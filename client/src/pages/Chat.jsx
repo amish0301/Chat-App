@@ -160,8 +160,6 @@ const Chat = ({ chatId }) => {
     [chatId]
   );
 
-  // console.log('oldMessages', oldMessages);
-
   const eventHandler = {
     [ALERT]: alertListener,
     [NEW_MESSAGE]: newMessagesListener,

@@ -152,6 +152,8 @@ const removeMembers = TryCatch(async (req, res, next) => {
     return next(new ErrorHandler("Group must have atleast 2 members", 400));
   }
 
+  const allMembers = chat.members.map(i => i.toString());
+
   chat.members = chat.members.filter(
     (member) => member.toString() !== userId.toString()
   );
@@ -163,6 +165,8 @@ const removeMembers = TryCatch(async (req, res, next) => {
     chat.members,
     `${userThatwillBeRemoved.name} has been removed from the group`
   );
+
+  emitEvent(req, REFETCH_CHAT, allMembers);
 
   return res.status(200).json({ success: true, message: "Member Removed" });
 });
@@ -342,7 +346,7 @@ const getMessages = TryCatch(async (req, res, next) => {
 
   if (!chat.members.includes(req.userId.toString()))
     return next(
-      new ErrorHandler("You are not allowed to access this chat", 403)
+      new ErrorHandler("You're no longer a member of this chat", 403)
     );
 
   const [messages, totalMessagesCount] = await Promise.all([

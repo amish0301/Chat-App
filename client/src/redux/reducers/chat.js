@@ -25,9 +25,11 @@ const chatSlice = createSlice({
     resetNotificationCount: (state) => {
       state.notificationCount = 0;
     },
+
+    // might be a error in accessing payload, it would either payload.chatId
     setNewMessagesAlert: (state, action) => {
       const index = state.newMessagesAlert.findIndex(
-        (item) => item.chatdId === action.payload.chatdId
+        (item) => item.chatdId === action.payload
       );
 
       // index = if chat id exist in socket then only increment the message count
@@ -35,7 +37,7 @@ const chatSlice = createSlice({
         state.newMessagesAlert[index].messageCnt += 1;
       } else {
         state.newMessagesAlert.push({
-          chatId: action.payload.chatdId,
+          chatId: action.payload,
           messageCnt: 1,
         });
       }
