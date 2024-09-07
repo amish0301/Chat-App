@@ -13,6 +13,7 @@ const {
   REFETCH_CHAT,
   NEW_MESSAGE_ALERT,
   NEW_MESSAGE,
+  DELETE_MESSAGE,
 } = require("../constants/events");
 const { attachmentsMulter } = require("../middlewares/multer");
 
@@ -152,7 +153,7 @@ const removeMembers = TryCatch(async (req, res, next) => {
     return next(new ErrorHandler("Group must have atleast 2 members", 400));
   }
 
-  const allMembers = chat.members.map(i => i.toString());
+  const allMembers = chat.members.map((i) => i.toString());
 
   chat.members = chat.members.filter(
     (member) => member.toString() !== userId.toString()
@@ -374,11 +375,13 @@ const deleteMessage = TryCatch(async (req, res, next) => {
   if (!chat) return next(new ErrorHandler("Chat not found", 404));
 
   const message = await Message.findById(messageId);
-  if(!message) return next(new ErrorHandler("Message not found", 404));
+  if (!message) return next(new ErrorHandler("Message not found", 404));
 
-  if(message.sender.toString() !== req.userId.toString()) return next(new ErrorHandler("You are not authorized to delete this message", 403));
+  if (message.sender.toString() !== req.userId.toString())
+    return next(
+      new ErrorHandler("You are not authorized to delete this message", 403)
+    );
 
-  // delete message
   await Message.findByIdAndDelete(messageId);
 
   return res.status(200).json({ success: true, message: "Message deleted" });
@@ -396,5 +399,5 @@ module.exports = {
   renameGroup,
   deleteChat,
   getMessages,
-  deleteMessage
+  deleteMessage,
 };

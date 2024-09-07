@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, LinearProgress, Typography } from '@mui/material';
 import React, { memo, useEffect, useState } from 'react'
 import moment from 'moment';
 import { fileFormat } from '../../lib/feature'
@@ -6,7 +6,7 @@ import RenderAttachment from './RenderAttachment';
 import { useSelector } from 'react-redux';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const MessageComponent = ({ message, user, deleteMessage }) => {
+const MessageComponent = ({ message, user, deleteMessage, isLoading }) => {
   const { sender, content, attachments = [], createdAt } = message;
   const sameSender = sender?._id === user?._id;
   const timeFormat = moment(createdAt).format('hh:mm A');
@@ -39,6 +39,7 @@ const MessageComponent = ({ message, user, deleteMessage }) => {
         position: "relative",
       }}
     >
+      {isLoading && <LinearProgress />}
       <div style={{
         backgroundColor: sameSender ? "#DCF8C6" : "#FFFFFF",
         color: "black",

@@ -10,7 +10,8 @@ const {
   NEW_MESSAGE,
   NEW_MESSAGE_ALERT,
   START_TYPING,
-  STOP_TYPING
+  STOP_TYPING,
+  DELETE_MESSAGE,
 } = require("./constants/events");
 const { getSockets } = require("./lib/helper");
 const Message = require("./models/message");
@@ -86,38 +87,39 @@ io.on("connection", (socket) => {
   // When new message will be send in chat, below listener will be triggered
   // Storing message in DB
   socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
-    const messageForRealtime = {
-      content: message,
-      _id: uuid(),
-      sender: {
-        _id: user?._id,
-        name: user?.name,
-      },
-      chat: chatId,
-      createdAt: new Date().toISOString(),
-    };
-
     const messageForDB = {
       content: message,
       sender: user?._id,
       chat: chatId,
     };
 
-    // Sockets of all members in a Particular Chat
-    const membersSocket = getSockets(members);
-
-    // Notifying all members associated with chatId to client side
-    io.to(membersSocket).emit(NEW_MESSAGE, {
-      chatId,
-      message: messageForRealtime,
-    });
-
-    // When new message is sent, alert all members associated with chatId
-    io.to(membersSocket).emit(NEW_MESSAGE_ALERT, { chatId });
-
     try {
-      await Message.create(messageForDB);
+      const savedMessage = await Message.create(messageForDB);
+
+      const messageForRealtime = {
+        content: savedMessage.content,
+        _id: savedMessage._id,
+        sender: {
+          _id: savedMessage.sender,
+          name: user?.name,
+        },
+        chat: chatId,
+        createdAt: savedMessage.createdAt,
+      };
+
+      // Sockets of all members in a Particular Chat
+      const membersSocket = getSockets(members);
+
+      // Notifying all members associated with chatId to client side
+      io.to(membersSocket).emit(NEW_MESSAGE, {
+        chatId,
+        message: messageForRealtime,
+      });
+
+      // When new message is sent, alert all members associated with chatId
+      io.to(membersSocket).emit(NEW_MESSAGE_ALERT, { chatId });
     } catch (error) {
+      console.log("Error saving  message:", error);
       throw new Error(error);
     }
   });
@@ -127,10 +129,10 @@ io.on("connection", (socket) => {
     io.to(membersSocket).emit(START_TYPING, { chatId });
   });
 
-  socket.on(STOP_TYPING, ({chatId, members}) => {
+  socket.on(STOP_TYPING, ({ chatId, members }) => {
     const membersSocket = getSockets(members);
     io.to(membersSocket).emit(STOP_TYPING, { chatId });
-  })
+  });
 
   socket.on("disconnect", () => {
     // console.log("User Disconnected", socket.id);

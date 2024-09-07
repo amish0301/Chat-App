@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import Header from './Header'
 import Title from '../shared/Title';
 import { Drawer, Grid, Skeleton } from '@mui/material';
@@ -20,6 +20,7 @@ const AppLayout = () => (WrappedComponent) => {
         const chatId = params.chatId;
         const dispatch = useDispatch();
         const navigate = useNavigate();
+        const deleteChatMenuAnchor = useRef(null);
 
         // Sockets
         const socket = getSocket();
@@ -53,15 +54,15 @@ const AppLayout = () => (WrappedComponent) => {
         // refetching chat list for updated notification
         const refetchListener = useCallback(() => {
             refetch();
-            navigate("/");
+            navigate('/');
         }, [refetch, navigate]);
 
         const eventHandler = { [NEW_MESSAGE_ALERT]: newMessageAlertListener, [NEW_REQUEST]: newRequestListener, [REFETCH_CHAT]: refetchListener };
         useSocketEvents(socket, eventHandler);
 
-        const handleDeleteChat = (_id, groupChat) => {
+        const handleDeleteChat = (e,_id, groupChat) => {
             dispatch(setIsDeleteMenu(true));
-            console.log("deleted chat", _id, groupChat);
+            deleteChatMenuAnchor.current = e.currentTarget;
         }
 
         const handleMobileClose = () => {

@@ -43,7 +43,6 @@ const GroupsList = ({ w = '100%', myGroups = [], chatId }) => {
 };
 
 // **** MAIN Group Component ****
-
 const Groups = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -236,7 +235,7 @@ const Groups = () => {
       {
         confirmDeleteDialog && (
           <Suspense fallback={<Backdrop open />}>
-            <ConfirmDeleteDialog open={confirmDeleteDialog} handleClose={closeConfirmDeleteDialog} deleteHandler={deleteHandler} />
+            <ConfirmDeleteDialog open={confirmDeleteDialog} handleClose={closeConfirmDeleteDialog} deleteHandler={deleteHandler} isLoading={isLoadingDeleteGroup} />
           </Suspense>
         )
       }

@@ -11,7 +11,7 @@ import MessageComponent from '../components/shared/MessageComponent';
 import { getSocket } from '../socket';
 import { ALERT, NEW_MESSAGE, START_TYPING, STOP_TYPING } from '../constants/events';
 import { useChatDetailsQuery, useDeleteMessageMutation, useGetMessagesQuery } from '../redux/apis/api';
-import { useSocketEvents, useXErrors } from '../hooks/hook';
+import { useAsyncMutation, useSocketEvents, useXErrors } from '../hooks/hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { useInfiniteScrollTop } from '6pp';
 import { setIsFileMenu, setShowEmojiPicker } from '../redux/reducers/misc';
@@ -26,7 +26,7 @@ const Chat = ({ chatId }) => {
   const navigate = useNavigate();
   const { user } = useSelector(state => state.auth);
   const { showEmojiPicker } = useSelector(state => state.utility);
-  const [deleteMessageRequest] = useDeleteMessageMutation();
+  const [deleteMessageRequest, isLoadingDeleteMessage] = useAsyncMutation(useDeleteMessageMutation);
 
   const containerRef = useRef(null);
   const bottomRef = useRef(null);
@@ -56,6 +56,7 @@ const Chat = ({ chatId }) => {
   const errors = [
     { isError: chatDetails.isError, error: chatDetails.error },
     { isError: oldMessagesChunk.isError, error: oldMessagesChunk.error },
+    { isError: deleteMessageRequest.isError, error: deleteMessageRequest.error }
   ];
 
   const members = chatDetails?.data?.chat?.members;
@@ -126,7 +127,7 @@ const Chat = ({ chatId }) => {
 
   const startTypingListener = useCallback(
     (data) => {
-      if (data.chatId !== chatId) return;
+      if (data.chatId !== chatId || !IamTyping) return;
       setUserTyping(true);
     },
     [chatId]
@@ -172,15 +173,9 @@ const Chat = ({ chatId }) => {
 
   useXErrors(errors);
 
-  const handleDeleteMessage = async (messageId) => {
-    try {
-      await deleteMessageRequest({ chatId, messageId }).unwrap();
-
-      // update the Local state of messages
-      setOldMessages((prev) => prev.filter((msg) => msg._id !== messageId));
-    } catch (error) {
-      throw error;
-    }
+  const handleDeleteMessage = (messageId) => {
+    deleteMessageRequest("Deleting Message...", { chatId, messageId });
+    setMessages((prev) => prev.filter((msg) => msg._id !== messageId)); 
   };
 
   const allMessages = [...oldMessages, ...messages];
@@ -192,7 +187,7 @@ const Chat = ({ chatId }) => {
       <Stack ref={containerRef} boxSizing={'border-box'} padding={'1rem'} spacing={'1rem'} bgcolor={grayColor} height={'90%'} sx={{ overflowX: 'hidden', overflowY: 'auto' }}>
         {/* messages */}
         {allMessages?.map((msg) => (
-          <MessageComponent key={msg._id} message={msg} user={user} deleteMessage={handleDeleteMessage} />
+          <MessageComponent key={msg._id} message={msg} user={user} deleteMessage={handleDeleteMessage} isLoading={isLoadingDeleteMessage}/>
         ))}
         {userTyping && <TypingLoader />}
         <div ref={bottomRef} />

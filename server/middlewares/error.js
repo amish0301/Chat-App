@@ -16,6 +16,8 @@ const errorHandler = (err, req, res, next) => {
     err.statusCode = 400;
   }
 
+  const envMode = process.env.NODE_ENV;
+
   const response = {
     success: false,
     message: err.message,

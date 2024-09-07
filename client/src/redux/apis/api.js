@@ -78,6 +78,7 @@ const api = createApi({
         credentials: "include",
         body: data,
       }),
+      invalidatesTags: ["Message"],
     }),
 
     deleteMessage: builder.mutation({
@@ -86,6 +87,7 @@ const api = createApi({
         method: "DELETE",
         credentials: "include",
       }),
+      invalidatesTags: ["Message"],
     }),
 
     myGroups: builder.query({

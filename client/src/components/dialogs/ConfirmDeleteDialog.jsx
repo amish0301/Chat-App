@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from '@mui/material'
 
-const ConfirmDeleteDialog = ({ open, handleClose, deleteHandler }) => {
+const ConfirmDeleteDialog = ({ open, handleClose, deleteHandler, isLoading }) => {
     return (
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle>Confirm Delete</DialogTitle>
@@ -12,7 +12,7 @@ const ConfirmDeleteDialog = ({ open, handleClose, deleteHandler }) => {
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>No</Button>
-                <Button color='error' onClick={deleteHandler}>Yes</Button>
+                <Button color='error' onClick={deleteHandler} disabled={isLoading}>Yes</Button>
             </DialogActions>
         </Dialog>
     )
