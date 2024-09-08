@@ -1,11 +1,11 @@
 import React, { Suspense, lazy, useEffect } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import ProtectRoute from './components/auth/ProtectRoute';
 import { LayoutLoader } from './components/layout/Loaders';
 import { serverURI } from './utils/config';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoading, userExists, userNotExists } from './redux/reducers/auth';
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import axios from 'axios';
 import './App.css';
 import { SocketProvider } from './socket';
@@ -36,8 +36,6 @@ const App = () => {
         const response = await axios.get(`${serverURI}/api/user/me`, { withCredentials: true });
         if (response.status === 200) {
           dispatch(userExists(response.data.user));
-        } else {
-          dispatch(userNotExists());
         }
       } catch (error) {
         if (error.response && error.response.status === 401) {
@@ -48,8 +46,8 @@ const App = () => {
       }
     }
 
-    checkUser();
-  }, [dispatch]);
+    if(!user) checkUser();
+  }, [user]);
 
 
   return loader ? <LayoutLoader /> : (
@@ -76,7 +74,7 @@ const App = () => {
           <Route path='*' element={<NotFound />}></Route>
         </Routes>
       </Suspense>
-      <Toaster position='top-right' />
+      <Toaster position='top-right' toastOptions={{ style: { backgroundColor: 'black', color: 'white' } }} />
     </BrowserRouter>
   )
 }

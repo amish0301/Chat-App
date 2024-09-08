@@ -74,7 +74,7 @@ const Chat = ({ chatId }) => {
     typingTimeout.current = setTimeout(() => {
       socket.emit(STOP_TYPING, { members, chatId });
       setIamTyping(false);
-    }, [2000]);
+    }, [500]);
   };
 
   const handleFileMenu = (e) => {
@@ -89,6 +89,7 @@ const Chat = ({ chatId }) => {
 
     // Emitting the message to the server
     socket.emit(NEW_MESSAGE, { chatId, members, message });
+    setIamTyping(false);
     setMessage("");
   };
 
@@ -127,7 +128,7 @@ const Chat = ({ chatId }) => {
 
   const startTypingListener = useCallback(
     (data) => {
-      if (data.chatId !== chatId || !IamTyping) return;
+      if (data.chatId !== chatId) return;
       setUserTyping(true);
     },
     [chatId]
@@ -175,7 +176,7 @@ const Chat = ({ chatId }) => {
 
   const handleDeleteMessage = (messageId) => {
     deleteMessageRequest("Deleting Message...", { chatId, messageId });
-    setMessages((prev) => prev.filter((msg) => msg._id !== messageId)); 
+    setOldMessages((prev) => prev.filter((msg) => msg._id !== messageId)); 
   };
 
   const allMessages = [...oldMessages, ...messages];
@@ -189,7 +190,7 @@ const Chat = ({ chatId }) => {
         {allMessages?.map((msg) => (
           <MessageComponent key={msg._id} message={msg} user={user} deleteMessage={handleDeleteMessage} isLoading={isLoadingDeleteMessage}/>
         ))}
-        {userTyping && <TypingLoader />}
+        {userTyping && !IamTyping && <TypingLoader />}
         <div ref={bottomRef} />
       </Stack>
       <form style={{ height: '10%' }} onSubmit={onSendMessage} onKeyDown={handleEmojiOnkeyDown}>

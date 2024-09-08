@@ -11,6 +11,7 @@ import { useAsyncMutation } from '../../hooks/hook'
 const SearchDialog = () => {
   const dispatch = useDispatch();
   const { isSearch } = useSelector(state => state.utility);
+  const { user } = useSelector(state => state.auth);
   const [searchUser] = useLazySearchUserQuery();
   const [sendFriendRequest, isLoading] = useAsyncMutation(useSendFriendRequestMutation);
   const [users, setUsers] = useState([]);
@@ -18,7 +19,7 @@ const SearchDialog = () => {
   const search = useInputValidation("");
 
   const addFriendHandler = async (id) => {
-    sendFriendRequest("Sending Friend request...", { receiverId: id })
+    await sendFriendRequest("Sending Friend request...", { receiverId: id });
   };
 
   const closeDialog = () => dispatch(setIsSearch(false));
@@ -48,8 +49,8 @@ const SearchDialog = () => {
         {/* Search results */}
         <List sx={{ maxHeight: '15rem', overflow: 'auto', marginTop: '1rem' }}>
           {
-            users?.map((user) => (
-              <UserItem user={user} key={user._id} handler={addFriendHandler} handlerIsLoading={isLoading} />
+            users?.map((i) => (
+              i._id !== user?._id && <UserItem user={i} key={i._id} handler={addFriendHandler} handlerIsLoading={isLoading} />
             ))
           }
         </List>

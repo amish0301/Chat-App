@@ -3,12 +3,12 @@ import { Avatar, Button, Dialog, DialogTitle, IconButton, List, ListItem, Stack,
 import { Close as CloseIcon, Done as DoneIcon, Close as CancelIcon } from '@mui/icons-material'
 import { useAcceptFriendRequestMutation, useGetNotificationsQuery } from '../../redux/apis/api';
 import { useSelector, useDispatch } from 'react-redux';
-import { useXErrors } from '../../hooks/hook';
+import { useAsyncMutation, useXErrors } from '../../hooks/hook';
 import { setIsNotification } from '../../redux/reducers/misc'
 import { Skeleton } from '@mui/material'
 
 
-const NotifiacationItem = memo(({ sender, _id, handler }) => {
+const NotificationItem = memo(({ sender, _id, handler }) => {
   const { name, avatar } = sender;
 
   return (
@@ -36,22 +36,13 @@ const Notification = () => {
   const dispatch = useDispatch();
   const { isNotification } = useSelector(state => state.utility);
 
-  const [acceptReq] = useAcceptFriendRequestMutation();
+  const [acceptReq] = useAsyncMutation(useAcceptFriendRequestMutation);
 
   const friendRequestHandler = async ({ _id, accept }) => {
-    try {
-      const res = await acceptReq({ requestId: _id, accept });
-      if (res.data?.success) {
-        console.log("User Socket use")
-        toast.success(res?.data?.message);
-      } else {
-        toast.error(res?.data?.error || 'Something went wrong');
-      }
-    } catch (error) {
-      toast.error('Something went wrong');
-      console.log("in Notification File", error);
-    }
-  };
+    dispatch(setIsNotification(false));
+    await acceptReq("Accepting...", { requestId: _id, accept });
+  }
+
   const handleCloseDialog = () => {
     dispatch(setIsNotification(false));
   };
@@ -61,7 +52,7 @@ const Notification = () => {
 
   return (
     <Dialog open={isNotification} onClose={handleCloseDialog}>
-      <Stack p={{ xs: '1rem', sm: '2rem' }} maxWidth={'25rem'}>
+      <Stack p={{ xs: '1rem', sm: '2rem' }} sx={{ width: { sm: '30rem', xs: '100%' } }}>
         <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <DialogTitle textAlign={'center'}>Notifications</DialogTitle>
           <IconButton size='medium' onClick={handleCloseDialog}>
@@ -74,15 +65,15 @@ const Notification = () => {
           isLoading ? <Skeleton /> : (
             <>
               {
-                data?.allRequests?.length > 0 ? (
-                  <List sx={{ maxHeight: '15rem', overflow: 'auto', marginTop: '1rem' }}>
+                data?.requests?.length > 0 ? (
+                  <List sx={{ maxHeight: '20rem', overflow: 'auto', marginTop: '1rem', width: '100%' }}>
                     {
-                      data?.allRequests.map((noti) => (
-                        <NotifiacationItem key={noti._id} sender={noti.sender} _id={noti._id} handler={friendRequestHandler} />
+                      data.requests.map((noti) => (
+                        <NotificationItem key={noti._id} sender={noti.sender} _id={noti._id} handler={friendRequestHandler} />
                       ))
                     }
                   </List>
-                ) : (<Typography textAlign={'center'}>No Notifications</Typography>)
+                ) : (<Typography textAlign={'center'} sx={{ marginBlock: '1rem' }}>No Notifications</Typography>)
               }
             </>
           )

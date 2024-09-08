@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Skeleton, Stack } from "@mui/material";
+import { Grid, Skeleton, Stack, Box } from "@mui/material";
 import { BouncingSkeleton } from "../styles/StyledComponents";
 
 export const LayoutLoader = () => {

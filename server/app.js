@@ -11,13 +11,11 @@ const {
   NEW_MESSAGE_ALERT,
   START_TYPING,
   STOP_TYPING,
-  DELETE_MESSAGE,
 } = require("./constants/events");
 const { getSockets } = require("./lib/helper");
 const Message = require("./models/message");
 const cloudinary = require("cloudinary").v2;
 const { socketAuthenticater } = require("./middlewares/auth");
-const { v4: uuid } = require("uuid");
 
 require("dotenv").config({ path: "./.env" });
 
@@ -38,6 +36,8 @@ const corsOptions = {
 };
 
 connectMongoDB(mongouri);
+
+// Cloudinary Config
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,

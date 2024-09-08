@@ -49,10 +49,10 @@ const Login = () => {
                 password: password.value,
             }, config);
 
-            dispatch(userExists(data.user));
             toast.success(data.message);
+            dispatch(userExists(data.user));
         } catch (error) {
-            console.log(error?.response?.data?.message);
+            toast.error(error?.response?.data?.message || "User doesn't Exist");
         }
 
     }
@@ -102,10 +102,6 @@ const Login = () => {
                                     <TextField required fullWidth label='Password' type={showPassword ? 'text' : 'password'} margin='normal' variant='outlined' value={password.value} onChange={password.changeHandler} />
                                     <span className='togglePassIcon' onClick={handleToggle}>{showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}</span>
                                 </div>
-                                {/* validating password */}
-                                {
-                                    password.error && (<Typography color={"error"} variant="caption">{password.error}</Typography>)
-                                }
                                 <Button sx={{ marginTop: '1rem' }} variant='contained' color='primary' type='submit' fullWidth>Login</Button>
                                 <Typography textAlign={'center'} m={'1rem'} textTransform={'uppercase'}>or</Typography>
                                 <Button className='btn_login_signup' variant='text' color='secondary' fullWidth onClick={toggleLogin}>Sign Up</Button>

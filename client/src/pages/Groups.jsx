@@ -6,10 +6,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Link } from '../components/styles/StyledComponents';
 import AvatarCard from '../components/shared/AvatarCard';
 import UserItem from '../components/shared/UserItem';
-import { useDeleteChatMutation, useMyGroupsQuery, useRemoveGroupMemberMutation, useRenameGroupMutation } from '../redux/apis/api';
+import { useChatDetailsQuery, useDeleteChatMutation, useMyGroupsQuery, useRemoveGroupMemberMutation, useRenameGroupMutation } from '../redux/apis/api';
 import { useAsyncMutation, useXErrors } from '../hooks/hook';
 import { GroupsLayoutLoader } from '../components/layout/Loaders';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setIsAddMember } from '../redux/reducers/misc';
 
 const ConfirmDeleteDialog = lazy(() => import('../components/dialogs/ConfirmDeleteDialog'));
@@ -87,10 +87,6 @@ const Groups = () => {
       isError: removeMember.isError,
       error: removeMember.error,
     },
-    {
-      isError: addMembers.isError,
-      error: addMembers.error,
-    }
   ];
 
   // Error Handler

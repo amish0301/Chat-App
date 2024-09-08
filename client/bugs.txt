@@ -1,0 +1,2 @@
+1. auto refresh messages after deleting it.
+    sometimes messages not rendered after deletion.

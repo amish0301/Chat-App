@@ -5,12 +5,12 @@ const getOtherMember = (members, userId) => {
 };
 
 const getSockets = (users = []) => {
-  const sockets = users?.map((userIds) => userSocketIDs.get(userIds?.toString()));
+  const sockets = users?.map((userIds) =>
+    userSocketIDs.get(userIds?.toString())
+  );
   return sockets;
 };
 
-const getBase64 = (file) => {
-  return `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
-};
+const getBase64 = (file) => `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
 
 module.exports = { getOtherMember, getSockets, getBase64 };

@@ -32,7 +32,7 @@ const chatSlice = createSlice({
         (item) => item.chatdId === action.payload
       );
 
-      // index = if chat id exist in socket then only increment the message count
+      // index = if chat id exist in socket then increment only the message count
       if (index !== -1) {
         state.newMessagesAlert[index].messageCnt += 1;
       } else {

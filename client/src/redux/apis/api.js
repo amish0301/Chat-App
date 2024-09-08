@@ -7,6 +7,14 @@ const api = createApi({
   tagTypes: [["Chat"], ["User"], ["Message"]],
 
   endpoints: (builder) => ({
+    isAuth: builder.mutation({
+      query: () => ({
+        url: '/user/me',
+        method: "GET",
+        credentials: "include",
+      }),
+      invalidatesTags: ["User"],
+    }),
     myChat: builder.query({
       query: () => ({
         url: "/chat/my/chats",
@@ -154,11 +162,21 @@ const api = createApi({
       }),
       invalidatesTags: ["Chat"],
     }),
+
+    leaveGroup: builder.mutation({
+      query: (chatId) => ({
+        url: `/chat/leave/${chatId}`,
+        method: "DELETE",
+        credentials: "include",
+      }),
+      invalidatesTags: ["Chat"],
+    }),
   }),
 });
 
 export default api;
 export const {
+  useIsAuthMutation,
   useMyChatQuery,
   useLazySearchUserQuery,
   useSendFriendRequestMutation,
@@ -175,4 +193,5 @@ export const {
   useRemoveGroupMemberMutation,
   useAddGroupMembersMutation,
   useDeleteChatMutation,
+  useLeaveGroupMutation,
 } = api;

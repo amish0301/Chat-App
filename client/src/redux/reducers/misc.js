@@ -10,6 +10,10 @@ const initialState = {
   isDeleteMenu: false,
   uploadingLoader: false,
   showEmojiPicker: false,
+  selectedDeleteChat: {
+    groupChat: false,
+    chatId: ""
+  },
 };
 
 const utilitySlice = createSlice({
@@ -43,6 +47,9 @@ const utilitySlice = createSlice({
     setShowEmojiPicker: (state, action) => {
       state.showEmojiPicker = action.payload;
     },
+    setSelectedDeleteChat: (state, action) => {
+      state.selectedDeleteChat = action.payload;
+    },
   },
 });
 
@@ -56,5 +63,6 @@ export const {
   setIsFileMenu,
   setIsDeleteMenu,
   setUploadingLoader,
-  setShowEmojiPicker
+  setShowEmojiPicker,
+  setSelectedDeleteChat
 } = utilitySlice.actions;

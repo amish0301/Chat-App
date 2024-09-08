@@ -7,12 +7,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Profile from '../Profile'
 import { useMyChatQuery } from '../../redux/apis/api';
 import { useDispatch, useSelector } from 'react-redux';
-import { setIsDeleteMenu, setIsMobile } from '../../redux/reducers/misc';
+import { setIsDeleteMenu, setIsMobile, setSelectedDeleteChat } from '../../redux/reducers/misc';
 import { useSocketEvents, useXErrors } from '../../hooks/hook';
 import { getSocket } from '../../socket';
 import { NEW_MESSAGE_ALERT, NEW_REQUEST, REFETCH_CHAT } from '../../constants/events';
 import { incrementNotificationCount, setNewMessagesAlert } from '../../redux/reducers/chat';
 import { getOrSaveFromStorage } from '../../lib/feature';
+import DeleteChatMenu from '../dialogs/DeleteChatMenu';
 
 const AppLayout = () => (WrappedComponent) => {
     return (props) => {
@@ -60,8 +61,9 @@ const AppLayout = () => (WrappedComponent) => {
         const eventHandler = { [NEW_MESSAGE_ALERT]: newMessageAlertListener, [NEW_REQUEST]: newRequestListener, [REFETCH_CHAT]: refetchListener };
         useSocketEvents(socket, eventHandler);
 
-        const handleDeleteChat = (e,_id, groupChat) => {
+        const handleDeleteChat = (e, chatId, groupChat) => {
             dispatch(setIsDeleteMenu(true));
+            dispatch(setSelectedDeleteChat({ groupChat, chatId }));
             deleteChatMenuAnchor.current = e.currentTarget;
         }
 
@@ -73,10 +75,11 @@ const AppLayout = () => (WrappedComponent) => {
             <>
                 <Title />
                 <Header />
+                <DeleteChatMenu dispatch={dispatch} deleteChatMenuAnchor={deleteChatMenuAnchor.current} />
                 <Grid container height={"calc(100vh - 4rem)"}>
                     <Grid item sm={4} md={3} sx={{ display: { xs: 'none', sm: 'block' } }} height={"100%"}>
                         {
-                            isLoading ? (<Skeleton height={"100%"}/>) : (<ChatList chats={data?.chats} chatId={chatId} newMessagesAlert={newMessagesAlert} onlineUsers={['2', '3', '4']} handleDeleteChat={handleDeleteChat} />)
+                            isLoading ? (<Skeleton height={"100%"} />) : (<ChatList chats={data?.chats} chatId={chatId} newMessagesAlert={newMessagesAlert} onlineUsers={['2', '3', '4']} handleDeleteChat={handleDeleteChat} />)
                         }
                     </Grid>
                     {/* for showing profile change below grid with for md = 5 & lg = 6 */}
@@ -88,6 +91,7 @@ const AppLayout = () => (WrappedComponent) => {
                     </Grid>
                 </Grid>
 
+                {/* Mobile Screen */}
                 {
                     isLoading ? (<Skeleton />) : (
                         <Drawer open={isMobile} onClose={handleMobileClose}>
