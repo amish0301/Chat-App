@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Skeleton, Stack, Box } from "@mui/material";
+import { Grid, Skeleton, Stack, Box, CircularProgress } from "@mui/material";
 import { motion } from "framer-motion";
 
 export const LayoutLoader = () => {
@@ -98,4 +98,12 @@ export const GroupsLayoutLoader = () => {
         </Grid>
 
     );
+}
+
+export const ProgressiveLoader = () => {
+    return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <CircularProgress />
+        </Box>
+    )
 }

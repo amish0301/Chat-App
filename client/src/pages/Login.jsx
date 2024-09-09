@@ -1,17 +1,17 @@
-import React, { useState } from 'react'
-import { Avatar, Container, Paper, TextField, Typography, Button, Stack, IconButton, CircularProgress } from '@mui/material';
-import { CameraAlt as CameraIcon } from '@mui/icons-material'
+import { useFileHandler, useInputValidation, useStrongPassword } from '6pp';
+import { CameraAlt as CameraIcon } from '@mui/icons-material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { VisuallyHiddenInput } from '../components/styles/StyledComponents';
-import { useFileHandler, useInputValidation, useStrongPassword } from '6pp';
-import { userNameValidator } from '../utils/validator';
-import { bgGradiant } from '../components/styles/color';
-import { serverURI } from '../utils/config';
-import { useDispatch } from 'react-redux';
-import { userExists } from '../redux/reducers/auth';
-import toast from 'react-hot-toast';
+import { Avatar, Button, CircularProgress, Container, IconButton, Paper, Stack, TextField, Typography } from '@mui/material';
 import axios from 'axios';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
+import { bgGradiant } from '../components/styles/color';
+import { VisuallyHiddenInput } from '../components/styles/StyledComponents';
+import { userExists } from '../redux/reducers/auth';
+import { serverURI } from '../utils/config';
+import { userNameValidator } from '../utils/validator';
 
 const Login = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -35,6 +35,7 @@ const Login = () => {
     // Need to FIX
     const handleLogin = async (e) => {
         e.preventDefault();
+        const toastId = toast.loading("Verifying Credentials...");
         setIsLoading(true);
 
         const config = {
@@ -50,10 +51,10 @@ const Login = () => {
                 password: password.value,
             }, config);
 
-            toast.success(data.message);
+            toast.success(data.message, { id: toastId });
             dispatch(userExists(data.user));
         } catch (error) {
-            toast.error(error?.response?.data?.message || "User doesn't Exist");
+            toast.error(error?.response?.data?.message || "User doesn't Exist", { id: toastId });
         }finally{
             setIsLoading(false);
         }
@@ -62,6 +63,7 @@ const Login = () => {
 
     const handleSignUp = async (e) => {
         e.preventDefault();
+        const toastId = toast.loading("Creating an Account...");
         setIsLoading(true);
 
         const formData = new FormData();
@@ -83,9 +85,9 @@ const Login = () => {
         try {
             const { data } = await axios.post(`${serverURI}/api/user/signup`, formData, config);
             dispatch(userExists(data.user));
-            toast.success(data.message);
+            toast.success(data.message, { id: toastId });
         } catch (error) {
-            console.log(error?.response?.data?.message || "Something went wrong");
+            toast.error(error?.response?.data?.message || "Something went wrong", { id: toastId });
         }finally{
             setIsLoading(false);
         }
@@ -108,11 +110,11 @@ const Login = () => {
                                     <TextField required fullWidth label='Password' type={showPassword ? 'text' : 'password'} margin='normal' variant='outlined' value={password.value} onChange={password.changeHandler} />
                                     <span className='togglePassIcon' onClick={handleToggle}>{showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}</span>
                                 </div>
-                                <Button sx={{ marginTop: '1rem' }} variant='contained' color='primary' type='submit' fullWidth>
+                                <Button sx={{ marginTop: '1rem' }} variant='contained' color='primary' type='submit' fullWidth disabled={isLoading}>
                                     {isLoading ? <CircularProgress size={20} sx={{ color: 'white' }} /> : "Login"}
                                 </Button>
                                 <Typography textAlign={'center'} m={'1rem'} textTransform={'uppercase'}>or</Typography>
-                                <Button className='btn_login_signup' variant='text' color='secondary' fullWidth onClick={toggleLogin}>Sign Up</Button>
+                                <Button className='btn_login_signup' variant='text' color='secondary' fullWidth onClick={toggleLogin} disabled={isLoading}>Sign Up</Button>
                             </form>
                         </>) : (<>
                             <Typography variant='h5' sx={{ fontWeight: 'bold' }}>Sign Up</Typography>
@@ -154,7 +156,7 @@ const Login = () => {
                                     {isLoading ? <CircularProgress sx={{ color: 'white' }} size={20} /> : 'Sign Up'}
                                 </Button>
                                 <Typography textAlign={'center'} m={'1rem'} textTransform={'uppercase'}>or</Typography>
-                                <Button className='btn_login_signup' variant='text' color='secondary' fullWidth onClick={toggleLogin}>Login</Button>
+                                <Button className='btn_login_signup' variant='text' color='secondary' fullWidth onClick={toggleLogin} disabled={isLoading}>Login</Button>
                             </form>
                         </>)
                     }

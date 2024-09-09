@@ -3,6 +3,9 @@ import { Box, Drawer, Grid, IconButton, Stack, Typography, styled } from '@mui/m
 import { Menu as MenuIcon, Close as CloseIcon, Dashboard as DashboardIcon, ManageAccounts as ManageAccountsIcon, Groups as GroupsIcon, Message as MessageIcon, ExitToApp as ExitToAppIcon } from '@mui/icons-material'
 import { useLocation, Link as LinkComponent, Navigate } from 'react-router-dom'
 import { matBlack } from '../styles/color'
+import { useDispatch, useSelector } from 'react-redux'
+import { setIsMobile } from '../../redux/reducers/misc'
+import { adminLogout } from '../../redux/thunks/admin'
 
 const Link = styled(LinkComponent)(
     `text-decoration: none;
@@ -47,10 +50,10 @@ const TabItem = ({ Icon, name }) => {
     );
 }
 
-const SideBar = ({ w = '100%' }) => {
+const SideBar = ({ w = '100%', dispatch }) => {
     const location = useLocation();
     const logoutHandler = () => {
-        console.log('logout');
+        dispatch(adminLogout());
     }
 
     return (
@@ -78,16 +81,17 @@ const SideBar = ({ w = '100%' }) => {
     );
 }
 
-const isAdmin = true;
-
 const AdminLayout = ({ children }) => {
-    const [isMobile, setIsMobile] = useState(false);
+    const { isAdmin } = useSelector(state => state.auth);
+    const { isMobile } = useSelector(state => state.utility);
+    const dispatch = useDispatch();
+
     const handleMobile = () => {
-        setIsMobile(!isMobile);
+        dispatch(setIsMobile(prev => !prev));
     }
     const handleClose = () => setIsMobile(false);
 
-    if(!isAdmin) return <Navigate to={'/admin'} replace/>
+    if (!isAdmin) return <Navigate to={'/admin'} replace />
 
     return (
         <Grid container minHeight={'100vh'}>
@@ -96,15 +100,15 @@ const AdminLayout = ({ children }) => {
                     {isMobile ? <CloseIcon /> : <MenuIcon />}
                 </IconButton>
             </Box>
-            <Grid item md={4} lg={3} sx={{ display: { xs: 'none', sm: 'block' }}}>
-                <SideBar />
+            <Grid item md={4} lg={3} sx={{ display: { xs: 'none', sm: 'block' } }}>
+                <SideBar dispatch={dispatch} />
             </Grid>
-            <Grid item xs={12} md={8} lg={9} sx={{ bgcolor: '#f5f5f5'}}>
+            <Grid item xs={12} md={8} lg={9} sx={{ bgcolor: '#f5f5f5' }}>
                 {children}
             </Grid>
 
             <Drawer open={isMobile} onClose={handleClose}>
-                <SideBar w={'50vw'} />
+                <SideBar w={'50vw'} dispatch={dispatch} />
             </Drawer>
         </Grid>
     )

@@ -1,7 +1,7 @@
 const { TryCatch, ErrorHandler } = require("../utils/ErrorHandler");
 const { User } = require("../models/user");
 const { Chat } = require("../models/chat");
-const { Message } = require("../models/message");
+const Message = require("../models/message");
 const jwt = require("jsonwebtoken");
 const { cookieOptions } = require("../constants/cookie");
 const { adminSecretKey } = require("../constants/data");
@@ -15,7 +15,10 @@ const adminLogin = TryCatch(async (req, res, next) => {
   const token = jwt.sign({ secretKey }, process.env.JWT_SECRET);
   return res
     .status(200)
-    .cookie("adminToken", token, { ...cookieOptions, maxAge: 1000 * 60 * 15 })
+    .cookie("adminToken", token, {
+      ...cookieOptions,
+      maxAge: 6 * 60 * 60 * 1000,
+    })
     .json({ success: true, message: "Admin Logged In Successfully" });
 });
 
@@ -31,7 +34,7 @@ const getAdminData = TryCatch(async (req, res, next) => {
 });
 
 const getUsers = TryCatch(async (req, res, next) => {
-  const users = await User.find({});
+  const users = await User.find().select('name username avatar _id');
 
   const transformedUsers = await Promise.all(
     users.map(async ({ name, username, avatar, _id }) => {
@@ -53,9 +56,7 @@ const getUsers = TryCatch(async (req, res, next) => {
 
   return res.status(200).json({
     success: true,
-    MaxGroups: maxGroup,
-    Name: name,
-    Users: transformedUsers,
+    allUsers: transformedUsers,
   });
 });
 
@@ -89,18 +90,17 @@ const getChats = TryCatch(async (req, res, next) => {
     })
   );
 
-  return res.status(200).json({ success: true, Chats: transformedChats });
+  return res.status(200).json({ success: true, chats: transformedChats });
 });
 
 const getMessages = TryCatch(async (req, res, next) => {
-  const messages = await Message.find({})
+  const messages = await Message.find()
     .populate("sender", "name avatar")
     .populate("chat", "groupChat");
 
   const transformedMessages = messages.map(
     ({ _id, attachments, content, createdAt, sender, chat }) => ({
       _id,
-      attachments,
       content,
       createdAt,
       chat: chat._id,
@@ -113,24 +113,17 @@ const getMessages = TryCatch(async (req, res, next) => {
     })
   );
 
-  return res.status(200).json({ success: true, Messages: transformedMessages });
+  return res.status(200).json({ success: true, messages: transformedMessages });
 });
 
 const getDashboardStats = TryCatch(async (req, res, next) => {
   const [groupsCount, userCount, messagesCount, totalChatCount] =
     await Promise.all([
       Chat.countDocuments({ groupChat: true }),
-      User.countDocuments({}),
-      Message.countDocuments({}),
-      Chat.countDocuments({}),
+      User.countDocuments(),
+      Message.countDocuments(),
+      Chat.countDocuments(),
     ]);
-
-  const stats = {
-    Total_Groups: groupsCount,
-    Total_Users: userCount,
-    Total_Messages: messagesCount,
-    Total_Chats: totalChatCount,
-  };
 
   // Dashboard Stats
   const today = new Date();
@@ -138,7 +131,7 @@ const getDashboardStats = TryCatch(async (req, res, next) => {
   last7Days.setDate(today.getDate() - 7);
 
   const last7DaysMessages = await Message.find({
-    createdAt: { $gte: last7Days },
+    createdAt: { $gte: last7Days, $lte: today },
   }).select("createdAt");
 
   const messages = new Array(7).fill(0);
@@ -152,9 +145,17 @@ const getDashboardStats = TryCatch(async (req, res, next) => {
     messages[6 - idx]++;
   });
 
+  const stats = {
+    groupsCount,
+    userCount,
+    messagesCount,
+    totalChatCount,
+    messagesChart: messages,
+  }
+
   return res
     .status(200)
-    .json({ success: true, stats: stats, messages: messages });
+    .json({ success: true, stats });
 });
 
 module.exports = {

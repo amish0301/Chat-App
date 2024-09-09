@@ -1,8 +1,10 @@
+import { useFetchData } from '6pp'
+import { Avatar } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import AdminLayout from '../../components/layout/AdminLayout'
+import { ProgressiveLoader } from '../../components/layout/Loaders'
 import Table from '../../components/shared/Table'
-import { Avatar } from '@mui/material'
-import { dashboardData } from '../../utils/sampleData'
+import { useXErrors } from '../../hooks/hook'
 import { transformImage } from '../../lib/feature'
 
 const columns = [
@@ -15,15 +17,22 @@ const columns = [
 ]
 
 const UserManagement = () => {
+
+  const { loading, data, error } = useFetchData(`${import.meta.env.VITE_SERVER}/api/admin/users`, "dashboard-users");
+
+  const { allUsers } = data || [];
+  useXErrors([{ isError: error, error }]);
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
-    setRows(dashboardData.users.map((user) => ({ ...user, id: user._id, avatar: transformImage(user.avatar, 50) })));
-  }, [])
+    if (allUsers) setRows(data.allUsers.map((user) => ({ ...user, id: user._id, avatar: transformImage(user.avatar, 50) })));
+  }, [data])
 
   return (
     <AdminLayout>
-      <Table rows={rows} cols={columns} heading={'All Users'} rowHeight={'10'} />
+      {
+        loading ? <ProgressiveLoader /> : <Table rows={rows} cols={columns} heading={'All Users'} rowHeight={50} />
+      }
     </AdminLayout >
   )
 }

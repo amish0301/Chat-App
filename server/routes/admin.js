@@ -13,17 +13,15 @@ const {
 const { adminLoginValidator, validateHandler } = require("../lib/validators");
 const { adminAuth } = require("../middlewares/auth");
 
-router.get("/", getAdminData);
-
 router.post("/verify", adminLoginValidator(), validateHandler, adminLogin);
-router.get("/logout", adminLogout);
 
 router.use(adminAuth);
-// Only admin can access below routes
+router.get("/", getAdminData);
 
+router.get("/logout", adminLogout);
 router.get("/users", getUsers);
 router.get("/chats", getChats);
-router.get("/messages", getMessages);
 router.get("/stats", getDashboardStats);
+router.get("/messages", getMessages);
 
 module.exports = router;

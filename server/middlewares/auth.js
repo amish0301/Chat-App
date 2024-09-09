@@ -24,10 +24,10 @@ const adminAuth = (req, res, next) => {
     const token = req.cookies[process.env.ADMIN_TOKEN];
     if (!token) return next(new ErrorHandler("Only Admins can access", 401));
 
-    const secretKey = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    if (secretKey !== adminSecretKey)
-      return next(new ErrorHandler("You are not authorized to access", 401));
+    if (decoded.secretKey !== adminSecretKey)
+      return next(new ErrorHandler("Only Admins can access", 401));
 
     next();
   } catch (error) {

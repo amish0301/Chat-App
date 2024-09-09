@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
-import { NEW_MESSAGE } from "../constants/events";
 
 const useXErrors = (errors = []) => {
     useEffect(() => {

@@ -1,22 +1,29 @@
-import React, { useState } from 'react'
-import { Container, Paper, TextField, Typography, Button } from '@mui/material';
+import { useInputValidation } from '6pp';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { bgGradiant } from '../../components/styles/color'
-import { useInputValidation } from '6pp';
+import { Button, Container, Paper, TextField, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-
-const isAdmin = true;
+import { bgGradiant } from '../../components/styles/color';
+import { adminLogin, getAdmin } from '../../redux/thunks/admin';
 
 const AdminLogin = () => {
-
-    if(isAdmin) return <Navigate to={'/admin/dashboard'}/>;
+    const { isAdmin } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
 
     const secretKey = useInputValidation("");
     const [showPassword, setShowPassword] = useState(false);
     const submitHandler = (e) => {
         e.preventDefault();
+        dispatch(adminLogin(secretKey.value));
     }
+
+    useEffect(() => {
+        dispatch(getAdmin());
+    }, [dispatch]);
+
+    if (isAdmin) return <Navigate to={'/admin/dashboard'} replace />
 
     return (
         <div style={{ backgroundImage: bgGradiant }}>
@@ -29,7 +36,9 @@ const AdminLogin = () => {
                                 <TextField required fullWidth label='Secret Key' type={showPassword ? 'text' : 'password'} margin='normal' variant='outlined' value={secretKey.value} onChange={secretKey.changeHandler} />
                                 <span className='togglePassIcon' onClick={() => setShowPassword(prev => !prev)}>{showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}</span>
                             </div>
-                            <Button sx={{ marginTop: '1rem' }} variant='contained' color='primary' type='submit' fullWidth>Login</Button>
+                            <Button sx={{ marginTop: '1rem' }} variant='contained' color='primary' type='submit' fullWidth>
+                                Login
+                            </Button>
                         </form>
                     </>
                 </Paper>
