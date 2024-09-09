@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Dialog, DialogTitle, IconButton, InputAdornment, List, Stack, TextField } from '@mui/material'
+import { CircularProgress, Dialog, DialogTitle, IconButton, InputAdornment, List, Stack, TextField } from '@mui/material'
 import { Search as SearchIcon, Close as CloseIcon, FitScreen } from '@mui/icons-material'
 import { useInputValidation } from '6pp'
 import UserItem from '../shared/UserItem'
@@ -12,12 +12,11 @@ const SearchDialog = () => {
   const dispatch = useDispatch();
   const { isSearch } = useSelector(state => state.utility);
   const { user } = useSelector(state => state.auth);
-  const [searchUser] = useLazySearchUserQuery();
-  const [sendFriendRequest, isLoading] = useAsyncMutation(useSendFriendRequestMutation);
+  const [searchUser, { isLoading }] = useLazySearchUserQuery();
+  const [sendFriendRequest, isLoadingSendFreindRequest] = useAsyncMutation(useSendFriendRequestMutation);
   const [users, setUsers] = useState([]);
 
   const search = useInputValidation("");
-
   const addFriendHandler = async (id) => {
     await sendFriendRequest("Sending Friend request...", { receiverId: id });
   };
@@ -47,10 +46,11 @@ const SearchDialog = () => {
         }} />
 
         {/* Search results */}
-        <List sx={{ maxHeight: '15rem', overflow: 'auto', marginTop: '1rem' }}>
+        <List sx={{ maxHeight: '30rem', overflow: 'auto', marginTop: '1rem' }}>
           {
+            isLoading ? <Stack alignItems={'center'} justifyContent={'center'}><CircularProgress /></Stack> :
             users?.map((i) => (
-              i._id !== user?._id && <UserItem user={i} key={i._id} handler={addFriendHandler} handlerIsLoading={isLoading} />
+              i._id !== user._id && <UserItem user={i} key={i._id} handler={addFriendHandler} handlerIsLoading={isLoadingSendFreindRequest} />
             ))
           }
         </List>

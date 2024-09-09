@@ -17,12 +17,11 @@ const NewGroup = () => {
   const { isNewGroup } = useSelector(state => state.utility);
 
   // BUG - send ChatId in below query 
-  const availableFriends = useAvailableFriendsQuery();
-  const members = availableFriends?.data?.freinds;
-  const [newGroup, isLoading] = useAsyncMutation(useNewGroupMutation);
+  const { isLoading, data, isError, error } = useAvailableFriendsQuery();
+  const [newGroup, isLoadingNewGroup] = useAsyncMutation(useNewGroupMutation);
 
   const errors = [
-    { isError: availableFriends.isError, error: availableFriends.error },
+    { isError, error }
   ];
 
   useXErrors(errors);
@@ -58,7 +57,7 @@ const NewGroup = () => {
 
         <Typography align='left' variant='body1' marginBottom={'.5rem'}>
           {
-            members?.length ? "Add Members" : "No Members Found"
+            data?.friends?.length ? "Add Members" : "No Members Found"
           }
         </Typography>
 
@@ -66,7 +65,7 @@ const NewGroup = () => {
         {
           <List sx={{ maxHeight: '15rem', overflow: 'auto' }}>
             {
-              availableFriends.isLoading ? <Skeleton variant='rectangular' height={40} /> : members?.map((user) => (
+              isLoading ? <Skeleton variant='rectangular' height={40} /> : data?.friends?.map((user) => (
                 <UserItem user={user} key={user._id} handler={selectMemberHandler} isAdded={selectedMembers.includes(user._id)} />
               ))
             }
@@ -75,7 +74,7 @@ const NewGroup = () => {
 
         <Stack direction={'row'} justifyContent={'space-between'}>
           <Button variant='text' color='error' size='large' onClick={closeHandler}>Cancel</Button>
-          <Button variant='contained' size='large' onClick={submitHandler} disabled={isLoading}>Create</Button>
+          <Button variant='contained' size='large' onClick={submitHandler} disabled={isLoadingNewGroup}>Create</Button>
         </Stack>
 
       </Stack>

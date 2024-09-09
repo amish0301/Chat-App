@@ -107,10 +107,14 @@ const api = createApi({
     }),
 
     availableFriends: builder.query({
-      query: (chatId) => ({
-        url: `/user/freinds?chatId=${chatId}`,
-        credentials: "include",
-      }),
+      query: (chatId) => {
+        let url = `/user/friends`;
+        if(chatId) url += `?chatId=${chatId}`;
+        return {
+          url,
+          credentials: "include",
+        };
+      },
       providesTags: ["Chat"],
     }),
 

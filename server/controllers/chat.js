@@ -13,7 +13,6 @@ const {
   REFETCH_CHAT,
   NEW_MESSAGE_ALERT,
   NEW_MESSAGE,
-  DELETE_MESSAGE,
 } = require("../constants/events");
 const { attachmentsMulter } = require("../middlewares/multer");
 
@@ -160,12 +159,10 @@ const removeMembers = TryCatch(async (req, res, next) => {
   );
 
   await chat.save();
-  emitEvent(
-    req,
-    ALERT,
-    chat.members,
-    `${userThatwillBeRemoved.name} has been removed from the group`
-  );
+  emitEvent(req, ALERT, chat.members, {
+    message: `${userThatwillBeRemoved.name} has been removed from the group`,
+    chatId,
+  });
 
   emitEvent(req, REFETCH_CHAT, allMembers);
 
@@ -199,7 +196,10 @@ const leaveGroup = TryCatch(async (req, res, next) => {
   chat.members = remainingMembers;
   const [user] = await Promise.all([User.findById(req.userId), chat.save()]);
 
-  emitEvent(req, ALERT, remainingMembers, `${user.name} has left the group`);
+  emitEvent(req, ALERT, remainingMembers, {
+    message: `${user.name} has left the group`,
+    chatId,
+  });
   return res
     .status(200)
     .json({ success: true, message: "You left the Group Successfully" });

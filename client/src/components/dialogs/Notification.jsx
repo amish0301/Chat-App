@@ -1,11 +1,10 @@
 import React, { memo } from 'react'
-import { Avatar, Button, Dialog, DialogTitle, IconButton, List, ListItem, Stack, Typography } from '@mui/material'
+import { Avatar, Button, CircularProgress, Dialog, DialogTitle, IconButton, List, ListItem, Stack, Typography } from '@mui/material'
 import { Close as CloseIcon, Done as DoneIcon, Close as CancelIcon } from '@mui/icons-material'
 import { useAcceptFriendRequestMutation, useGetNotificationsQuery } from '../../redux/apis/api';
 import { useSelector, useDispatch } from 'react-redux';
 import { useAsyncMutation, useXErrors } from '../../hooks/hook';
 import { setIsNotification } from '../../redux/reducers/misc'
-import { Skeleton } from '@mui/material'
 
 
 const NotificationItem = memo(({ sender, _id, handler }) => {
@@ -20,12 +19,14 @@ const NotificationItem = memo(({ sender, _id, handler }) => {
           flexGrow: 1, display: '-webkit-box', WebkitLineClamp: 1,
           WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%'
         }}>
-          {`${name} sent you a Friend request.`}
+          {/* {`${name} sent you a Friend request.`} */}
+          <strong style={{ fontWeight: "bolder" }}>{`${name} `}</strong>
+          sent you a Friend request.
         </Typography>
 
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: '0', sm: '0.5rem' }}>
-          <Button sx={{ fontWeight: "bolder" }} onClick={() => handler({ _id, accept: true })}><DoneIcon /></Button>
-          <Button color='error' sx={{ fontWeight: "bolder" }} onClick={() => handler({ _id, accept: false })}><CancelIcon /></Button>
+          <Button sx={{ fontWeight: "bolder" }} onClick={() => handler({ _id, accept: true })}><DoneIcon fontSize='medium' /></Button>
+          <Button color='error' sx={{ fontWeight: "bolder" }} onClick={() => handler({ _id, accept: false })}><CancelIcon fontSize='medium' /></Button>
         </Stack>
       </Stack>
     </ListItem>
@@ -62,21 +63,16 @@ const Notification = () => {
 
         {/* Notifiacations list */}
         {
-          isLoading ? <Skeleton /> : (
-            <>
-              {
-                data?.requests?.length > 0 ? (
-                  <List sx={{ maxHeight: '20rem', overflow: 'auto', marginTop: '1rem', width: '100%' }}>
-                    {
-                      data.requests.map((noti) => (
-                        <NotificationItem key={noti._id} sender={noti.sender} _id={noti._id} handler={friendRequestHandler} />
-                      ))
-                    }
-                  </List>
-                ) : (<Typography textAlign={'center'} sx={{ marginBlock: '1rem' }}>No Notifications</Typography>)
-              }
-            </>
-          )
+          isLoading ? <Stack alignItems={'center'} justifyContent={'center'}><CircularProgress /></Stack> :
+            data?.requests?.length > 0 ? (
+              <List sx={{ maxHeight: '20rem', overflow: 'auto', marginTop: '1rem', width: '100%' }}>
+                {
+                  data.requests.map((noti) => (
+                    <NotificationItem key={noti._id} sender={noti.sender} _id={noti._id} handler={friendRequestHandler} />
+                  ))
+                }
+              </List>
+            ) : (<Typography textAlign={'center'} sx={{ marginBlock: '1rem' }}>No Notifications</Typography>)
         }
       </Stack>
     </Dialog>

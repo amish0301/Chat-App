@@ -1,24 +1,24 @@
-import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-import AppLayout from '../components/layout/AppLayout';
-import { IconButton, Skeleton, Stack, Tooltip } from '@mui/material';
-import { grayColor, orange } from '../components/styles/color';
+import { useInfiniteScrollTop } from '6pp';
 import { AttachFile as AttachFileIcon, Send as SendIcon } from '@mui/icons-material';
 import EmojiIcon from '@mui/icons-material/EmojiEmotions';
 import EmojiOutline from '@mui/icons-material/EmojiEmotionsOutlined';
-import { InputBox } from '../components/styles/StyledComponents';
-import FileMenu from '../components/dialogs/FileMenu';
-import MessageComponent from '../components/shared/MessageComponent';
-import { getSocket } from '../socket';
-import { ALERT, NEW_MESSAGE, START_TYPING, STOP_TYPING } from '../constants/events';
-import { useChatDetailsQuery, useDeleteMessageMutation, useGetMessagesQuery } from '../redux/apis/api';
-import { useAsyncMutation, useSocketEvents, useXErrors } from '../hooks/hook';
-import { useDispatch, useSelector } from 'react-redux';
-import { useInfiniteScrollTop } from '6pp';
-import { setIsFileMenu, setShowEmojiPicker } from '../redux/reducers/misc';
-import { useNavigate } from 'react-router-dom';
+import { IconButton, Skeleton, Stack, Tooltip } from '@mui/material';
 import Picker from 'emoji-picker-react';
-import { removeNewMessagesAlert } from '../redux/reducers/chat';
+import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import FileMenu from '../components/dialogs/FileMenu';
+import AppLayout from '../components/layout/AppLayout';
 import { TypingLoader } from '../components/layout/Loaders';
+import MessageComponent from '../components/shared/MessageComponent';
+import { grayColor, orange } from '../components/styles/color';
+import { InputBox } from '../components/styles/StyledComponents';
+import { ALERT, NEW_MESSAGE, START_TYPING, STOP_TYPING } from '../constants/events';
+import { useAsyncMutation, useSocketEvents, useXErrors } from '../hooks/hook';
+import { useChatDetailsQuery, useDeleteMessageMutation, useGetMessagesQuery } from '../redux/apis/api';
+import { removeNewMessagesAlert } from '../redux/reducers/chat';
+import { setIsFileMenu, setShowEmojiPicker } from '../redux/reducers/misc';
+import { getSocket } from '../socket';
 
 const Chat = ({ chatId }) => {
   const socket = getSocket();
@@ -74,7 +74,7 @@ const Chat = ({ chatId }) => {
     typingTimeout.current = setTimeout(() => {
       socket.emit(STOP_TYPING, { members, chatId });
       setIamTyping(false);
-    }, [500]);
+    }, [1000]);
   };
 
   const handleFileMenu = (e) => {
@@ -176,7 +176,7 @@ const Chat = ({ chatId }) => {
 
   const handleDeleteMessage = (messageId) => {
     deleteMessageRequest("Deleting Message...", { chatId, messageId });
-    setOldMessages((prev) => prev.filter((msg) => msg._id !== messageId)); 
+    setOldMessages((prev) => prev.filter((msg) => msg._id !== messageId));
   };
 
   const allMessages = [...oldMessages, ...messages];
@@ -188,7 +188,7 @@ const Chat = ({ chatId }) => {
       <Stack ref={containerRef} boxSizing={'border-box'} padding={'1rem'} spacing={'1rem'} bgcolor={grayColor} height={'90%'} sx={{ overflowX: 'hidden', overflowY: 'auto' }}>
         {/* messages */}
         {allMessages?.map((msg) => (
-          <MessageComponent key={msg._id} message={msg} user={user} deleteMessage={handleDeleteMessage} isLoading={isLoadingDeleteMessage}/>
+          <MessageComponent key={msg._id} message={msg} user={user} deleteMessage={handleDeleteMessage} isLoading={isLoadingDeleteMessage} />
         ))}
         {userTyping && !IamTyping && <TypingLoader />}
         <div ref={bottomRef} />

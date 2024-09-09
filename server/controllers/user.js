@@ -14,7 +14,8 @@ const newUser = TryCatch(async (req, res, next) => {
   const { name, username, password, bio } = req.body;
 
   const file = req.file;
-  if (!file)return next(new ErrorHandler("Please Upload Your Profile Picture", 400));
+  if (!file)
+    return next(new ErrorHandler("Please Upload Your Profile Picture", 400));
 
   const result = await uploadFilesToCloudinary([file]);
 
@@ -77,7 +78,7 @@ const searchUser = TryCatch(async (req, res, next) => {
     _id: { $nin: allUsersFromMyChats },
     name: { $regex: name, $options: "i" },
   });
-  
+
   const users = allUsersExceptMyChats.map(({ _id, name, avatar }) => ({
     _id,
     name,
@@ -175,8 +176,6 @@ const getMyNotifications = TryCatch(async (req, res, next) => {
 const getMyFriends = TryCatch(async (req, res, next) => {
   const chatId = req.query.chatId;
 
-  if(!chatId) return next(new ErrorHandler("Chat Id Not Provided", 400));
-
   const chat = await Chat.find({
     members: req.userId,
     groupChat: false,
@@ -191,6 +190,7 @@ const getMyFriends = TryCatch(async (req, res, next) => {
     };
   });
 
+  // if chatId provided, then filter out the friends that are already in the chat
   if (chatId) {
     const chat = await Chat.findById(chatId);
     const availableFriends = friends.filter(
@@ -198,9 +198,9 @@ const getMyFriends = TryCatch(async (req, res, next) => {
     );
 
     return res.status(200).json({ success: true, friends: availableFriends });
-  } else {
-    return res.status(200).json({ success: true, friends });
   }
+
+  return res.status(200).json({ success: true, friends });
 });
 
 const deleteUser = TryCatch(async (req, res, next) => {
@@ -214,9 +214,7 @@ const deleteUser = TryCatch(async (req, res, next) => {
 const getMyProfile = TryCatch(async (req, res, next) => {
   const user = await User.findById(req.userId);
   if (!user) {
-    return next(
-      new ErrorHandler("User Not found", 404)
-    );
+    return next(new ErrorHandler("User Not found", 404));
   }
   return res.status(200).json({ success: true, user });
 });

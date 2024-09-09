@@ -1,6 +1,6 @@
 import React from "react";
 import { Grid, Skeleton, Stack, Box } from "@mui/material";
-import { BouncingSkeleton } from "../styles/StyledComponents";
+import { motion } from "framer-motion";
 
 export const LayoutLoader = () => {
     return (
@@ -28,11 +28,29 @@ export const LayoutLoader = () => {
 
 export const TypingLoader = () => {
     return (
-        <Stack spacing={'.5rem'} direction={'row'} display={'flex'} alignItems={'center'} padding={'.5rem'} justifyContent={'flex-start'}>
-            <BouncingSkeleton variant="circular" width={12} height={12} style={{ animationDelay: '.1s' }} />
-            <BouncingSkeleton variant="circular" width={12} height={12} style={{ animationDelay: '.2s' }} />
-            <BouncingSkeleton variant="circular" width={12} height={12} style={{ animationDelay: '.4s' }} />
-        </Stack>
+        <div style={{ display: 'flex', gap: '5px', marginLeft: '5px' }}>
+            {[...Array(3)].map((_, index) => (
+                <motion.span
+                    key={index}
+                    style={{
+                        width: "8px",
+                        height: "8px",
+                        borderRadius: "50%",
+                        backgroundColor: "#333",
+                        display: "inline-block",
+                    }}
+                    animate={{
+                        y: [0, -3, 0], // Move up and down
+                    }}
+                    transition={{
+                        repeat: Infinity, // Repeat the animation infinitely
+                        duration: .6, // Duration of one loop
+                        ease: "easeInOut", // Smooth easing
+                        delay: index * 0.2, // Stagger the animation for each dot
+                    }}
+                />
+            ))}
+        </div>
     )
 }
 

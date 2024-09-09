@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Avatar, Container, Paper, TextField, Typography, Button, Stack, IconButton } from '@mui/material';
+import { Avatar, Container, Paper, TextField, Typography, Button, Stack, IconButton, CircularProgress } from '@mui/material';
 import { CameraAlt as CameraIcon } from '@mui/icons-material'
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -16,7 +16,7 @@ import axios from 'axios';
 const Login = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
-
+    const [isLoading, setIsLoading] = useState(false);
     const name = useInputValidation("");
     const bio = useInputValidation("");
     const username = useInputValidation("", userNameValidator);
@@ -35,6 +35,7 @@ const Login = () => {
     // Need to FIX
     const handleLogin = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
 
         const config = {
             withCredentials: true,
@@ -53,12 +54,15 @@ const Login = () => {
             dispatch(userExists(data.user));
         } catch (error) {
             toast.error(error?.response?.data?.message || "User doesn't Exist");
+        }finally{
+            setIsLoading(false);
         }
 
     }
 
     const handleSignUp = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
 
         const formData = new FormData();
         formData.append("avatar", avatar.file);
@@ -82,6 +86,8 @@ const Login = () => {
             toast.success(data.message);
         } catch (error) {
             console.log(error?.response?.data?.message || "Something went wrong");
+        }finally{
+            setIsLoading(false);
         }
     }
 
@@ -102,7 +108,9 @@ const Login = () => {
                                     <TextField required fullWidth label='Password' type={showPassword ? 'text' : 'password'} margin='normal' variant='outlined' value={password.value} onChange={password.changeHandler} />
                                     <span className='togglePassIcon' onClick={handleToggle}>{showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}</span>
                                 </div>
-                                <Button sx={{ marginTop: '1rem' }} variant='contained' color='primary' type='submit' fullWidth>Login</Button>
+                                <Button sx={{ marginTop: '1rem' }} variant='contained' color='primary' type='submit' fullWidth>
+                                    {isLoading ? <CircularProgress size={20} sx={{ color: 'white' }} /> : "Login"}
+                                </Button>
                                 <Typography textAlign={'center'} m={'1rem'} textTransform={'uppercase'}>or</Typography>
                                 <Button className='btn_login_signup' variant='text' color='secondary' fullWidth onClick={toggleLogin}>Sign Up</Button>
                             </form>
@@ -142,7 +150,9 @@ const Login = () => {
                                     password.error && (<Typography color={"error"} variant="caption">{password.error}</Typography>)
                                 }
                                 <TextField required fullWidth label='Bio' margin='normal' variant='outlined' value={bio.value} onChange={bio.changeHandler} />
-                                <Button sx={{ marginTop: '1rem' }} variant='contained' color='primary' type='submit' fullWidth>Sign Up</Button>
+                                <Button sx={{ marginTop: '1rem' }} variant='contained' color='primary' type='submit' fullWidth disabled={isLoading}>
+                                    {isLoading ? <CircularProgress sx={{ color: 'white' }} size={20} /> : 'Sign Up'}
+                                </Button>
                                 <Typography textAlign={'center'} m={'1rem'} textTransform={'uppercase'}>or</Typography>
                                 <Button className='btn_login_signup' variant='text' color='secondary' fullWidth onClick={toggleLogin}>Login</Button>
                             </form>

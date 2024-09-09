@@ -1,10 +1,11 @@
 import { Box, LinearProgress, Typography } from '@mui/material';
-import React, { memo, useEffect, useState } from 'react'
+import React, { memo, useState } from 'react'
 import moment from 'moment';
 import { fileFormat } from '../../lib/feature'
 import RenderAttachment from './RenderAttachment';
 import { useSelector } from 'react-redux';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { motion } from "framer-motion";
 
 const MessageComponent = ({ message, user, deleteMessage, isLoading }) => {
   const { sender, content, attachments = [], createdAt } = message;
@@ -31,7 +32,13 @@ const MessageComponent = ({ message, user, deleteMessage, isLoading }) => {
   }
 
   return (
-    <div
+    <motion.div initial="hidden"
+      animate="visible"
+      variants={{
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0 },
+      }}
+      transition={{ staggerChildren: 0.1, duration: 0.3 }}
       style={{
         display: "flex",
         justifyContent: sameSender ? "flex-end" : "flex-start",
@@ -40,21 +47,26 @@ const MessageComponent = ({ message, user, deleteMessage, isLoading }) => {
       }}
     >
       {isLoading && <LinearProgress />}
-      <div style={{
-        backgroundColor: sameSender ? "#DCF8C6" : "#FFFFFF",
-        color: "black",
-        borderRadius: "8px",
-        padding: "7px 5px",
-        maxWidth: "50%", // Restricts the maximum width of the message bubble
-        minWidth: "65px", // Ensures there's enough space even for short messages
-        boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
-        fontSize: "14px",
-        textAlign: "left",
-        cursor: "text",
-        wordWrap: "break-word", // Prevents long words from overflowing
-        lineHeight: "1.4",
-        position: "relative",
-      }} onContextMenu={handleContextMenu} onMouseLeave={handleCloseContextMenu}>
+      <motion.div
+        variants={{
+          hidden: { opacity: 0 },
+          visible: { opacity: 1 },
+        }}
+        style={{
+          backgroundColor: sameSender ? "#DCF8C6" : "#FFFFFF",
+          color: "black",
+          borderRadius: "8px",
+          padding: "7px 5px",
+          maxWidth: "50%", // Restricts the maximum width of the message bubble
+          minWidth: "65px", // Ensures there's enough space even for short messages
+          boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
+          fontSize: "14px",
+          textAlign: "left",
+          cursor: "text",
+          wordWrap: "break-word", // Prevents long words from overflowing
+          lineHeight: "1.4",
+          position: "relative",
+        }} onContextMenu={handleContextMenu} onMouseLeave={handleCloseContextMenu}>
 
         {/* Context Menu Pop Up */}
         {
@@ -83,7 +95,7 @@ const MessageComponent = ({ message, user, deleteMessage, isLoading }) => {
         }
 
         {!sameSender && <Typography variant='caption' style={{
-          color: "#34B7F1",
+          color: "#0000b2",
           fontWeight: "600",
           marginBottom: "5px",
           display: "block",
@@ -125,8 +137,8 @@ const MessageComponent = ({ message, user, deleteMessage, isLoading }) => {
         >
           {timeFormat}
         </Typography>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }
 

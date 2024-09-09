@@ -1,19 +1,19 @@
-import React, { useCallback, useEffect, useRef } from 'react'
-import Header from './Header'
-import Title from '../shared/Title';
 import { Drawer, Grid, Skeleton } from '@mui/material';
-import ChatList from '../ChatList';
-import { useNavigate, useParams } from 'react-router-dom';
-import Profile from '../Profile'
-import { useMyChatQuery } from '../../redux/apis/api';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setIsDeleteMenu, setIsMobile, setSelectedDeleteChat } from '../../redux/reducers/misc';
-import { useSocketEvents, useXErrors } from '../../hooks/hook';
-import { getSocket } from '../../socket';
+import { useNavigate, useParams } from 'react-router-dom';
 import { NEW_MESSAGE_ALERT, NEW_REQUEST, REFETCH_CHAT } from '../../constants/events';
-import { incrementNotificationCount, setNewMessagesAlert } from '../../redux/reducers/chat';
+import { useSocketEvents, useXErrors } from '../../hooks/hook';
 import { getOrSaveFromStorage } from '../../lib/feature';
+import { useMyChatQuery } from '../../redux/apis/api';
+import { incrementNotificationCount, setNewMessagesAlert } from '../../redux/reducers/chat';
+import { setIsDeleteMenu, setIsMobile, setSelectedDeleteChat } from '../../redux/reducers/misc';
+import { getSocket } from '../../socket';
+import ChatList from '../ChatList';
 import DeleteChatMenu from '../dialogs/DeleteChatMenu';
+import Profile from '../Profile';
+import Title from '../shared/Title';
+import Header from './Header';
 
 const AppLayout = () => (WrappedComponent) => {
     return (props) => {
@@ -30,7 +30,6 @@ const AppLayout = () => (WrappedComponent) => {
         const { user } = useSelector(state => state.auth);
         const { newMessagesAlert } = useSelector(state => state.chat);
 
-
         // all below destructured data is provided by default RTK query
         const { isLoading, data, isError, error, refetch } = useMyChatQuery("");
 
@@ -45,7 +44,7 @@ const AppLayout = () => (WrappedComponent) => {
         // fetching if any notification available
         const newMessageAlertListener = useCallback((data) => {
             if (data.chatId === chatId) return;
-            dispatch(setNewMessagesAlert(data.chatdId));
+            dispatch(setNewMessagesAlert(data));
         }, [chatId])
 
         const newRequestListener = useCallback(() => {

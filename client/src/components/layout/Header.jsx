@@ -43,12 +43,8 @@ const Header = () => {
     const openNewGroup = () => dispatch(setIsNewGroup(true));
 
     const openNotification = () => {
-        if (isNotification) {
-            dispatch(setIsNotification(false));
-            dispatch(resetNotificationCount());
-        } else {
-            dispatch(setIsNotification(true));
-        }
+        dispatch(setIsNotification(prev => !prev));
+        dispatch(resetNotificationCount());
     }
 
     const navigate = useNavigate();
@@ -81,7 +77,7 @@ const Header = () => {
                             <IconBtn title={"Search"} icon={<PersonSearchIcon />} onClick={openSearch} />
                             <IconBtn title={"New Group"} icon={<AddIcon />} onClick={openNewGroup} />
                             <IconBtn title={"My Groups"} icon={<GroupIcon />} onClick={navigateToGroup} />
-                            <IconBtn title={"Notifications"} icon={<NotificationsIcon />} value={notificationCount} onClick={openNotification} />
+                            <IconBtn title={"Notifications"} icon={<NotificationsIcon />} value={notificationCount} onClick={openNotification}/>
                             <IconBtn title={"Logout"} icon={<LogoutIcon />} onClick={logoutHandler} />
                         </Box>
                     </Toolbar>
