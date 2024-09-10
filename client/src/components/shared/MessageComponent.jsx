@@ -1,11 +1,11 @@
-import { Box, LinearProgress, Typography } from '@mui/material';
-import React, { memo, useState } from 'react'
-import moment from 'moment';
-import { fileFormat } from '../../lib/feature'
-import RenderAttachment from './RenderAttachment';
-import { useSelector } from 'react-redux';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Box, LinearProgress, Typography } from '@mui/material';
 import { motion } from "framer-motion";
+import moment from 'moment';
+import React, { memo, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { fileFormat } from '../../lib/feature';
+import RenderAttachment from './RenderAttachment';
 
 const MessageComponent = ({ message, user, deleteMessage, isLoading }) => {
   const { sender, content, attachments = [], createdAt } = message;

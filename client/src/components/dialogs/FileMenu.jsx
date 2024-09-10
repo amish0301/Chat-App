@@ -25,6 +25,7 @@ const FileMenu = ({ anchorE1, chatId }) => {
   }
 
   const [sendAttachments] = useSendAttachmentsMutation();
+
   const fileChangeHandler = async (e, fileType) => {
     const files = Array.from(e.target.files);
 
@@ -54,8 +55,8 @@ const FileMenu = ({ anchorE1, chatId }) => {
   }
 
   return (
-    <Menu open={isFileMenu} anchorEl={anchorE1} onClose={closeFileMenu}>
-      <div style={{ width: '10rem', outline: 'none', borderRadius: '0.5rem', padding: '0.2rem' }}>
+    <Menu open={isFileMenu} anchorEl={anchorE1} onClose={closeFileMenu} >
+      <div style={{ width: '10rem', outline: 'none', background: 'inherit' }}>
         <MenuList sx={{ width: '100%' }}>
           <MenuItem onClick={() => selectRef(fileRef)}>
             <UploadFileIcon />

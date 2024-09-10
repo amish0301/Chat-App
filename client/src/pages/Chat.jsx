@@ -13,7 +13,7 @@ import { TypingLoader } from '../components/layout/Loaders';
 import MessageComponent from '../components/shared/MessageComponent';
 import { grayColor, orange } from '../components/styles/color';
 import { InputBox } from '../components/styles/StyledComponents';
-import { ALERT, NEW_MESSAGE, START_TYPING, STOP_TYPING } from '../constants/events';
+import { ALERT, CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, START_TYPING, STOP_TYPING } from '../constants/events';
 import { useAsyncMutation, useSocketEvents, useXErrors } from '../hooks/hook';
 import { useChatDetailsQuery, useDeleteMessageMutation, useGetMessagesQuery } from '../redux/apis/api';
 import { removeNewMessagesAlert } from '../redux/reducers/chat';
@@ -98,14 +98,16 @@ const Chat = ({ chatId }) => {
   }
 
   useEffect(() => {
-    // socket.emit(CHAT_JOINED, { userId: user._id, members });
+    socket.emit(CHAT_JOINED, { userId: user._id, members });
     dispatch(removeNewMessagesAlert(chatId));
     return () => {
       setMessages([]);
       setMessage("");
       setOldMessages([]);
       setPage(1);
-      // socket.emit(CHAT_LEAVED, { userId: user._id, members });
+      dispatch(setIsFileMenu(false));
+      dispatch(setShowEmojiPicker(false));
+      socket.emit(CHAT_LEAVED, { userId: user._id, members });
     };
   }, [chatId]);
 

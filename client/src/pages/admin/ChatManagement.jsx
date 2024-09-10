@@ -1,4 +1,5 @@
 import { useFetchData } from '6pp'
+import CheckIcon from '@mui/icons-material/Check'
 import { Avatar, Stack } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import AdminLayout from '../../components/layout/AdminLayout'
@@ -10,11 +11,18 @@ import { transformImage } from '../../lib/feature'
 
 const columns = [
   { field: 'id', headerName: 'ID', headerClassName: 'table-header', width: 200 },
-  { field: 'avatar', headerName: 'Avatar', headerClassName: 'table-header', width: 150, renderCell: (params) => <AvatarCard avatar={params.row.avatar} alt={params.row.avatar} /> },
-  { field: 'name', headerName: 'Name', headerClassName: 'table-header', width: 300 },
-  { field: 'totalMembers', headerName: 'Total Members', headerClassName: 'table-header', width: 120 },
-  { field: 'members', headerName: 'members', headerClassName: 'table-header', width: 300, renderCell: (params) => <AvatarCard avatar={params.row.members} /> },
+  { field: 'avatar', headerName: 'Avatar', headerClassName: 'table-header', width: 120, renderCell: (params) => <AvatarCard avatar={params.row.avatar} alt={params.row.avatar} /> },
+  { field: 'name', headerName: 'Name', headerClassName: 'table-header', width: 250 },
+  { field: 'totalMembers', headerName: 'Total Members', headerClassName: 'table-header', width: 150 },
+  { field: 'members', headerName: 'Members', headerClassName: 'table-header', width: 250, renderCell: (params) => <AvatarCard avatar={params.row.members} /> },
   { field: 'totalMessages', headerName: 'Total Messages', headerClassName: 'table-header', width: 120 },
+  {
+    field: 'groupChat', headerName: 'Group Chat', headerClassName: 'table-header', width: 100, renderCell: (params) => (
+      <>
+        {params.row.groupChat ? <CheckIcon /> : '-'}
+      </>
+    )
+  },
   {
     field: 'creator', headerName: 'Created By', headerClassName: 'table-header', width: 250, renderCell: (params) => (
       <Stack direction={'row'} alignItems={'center'} spacing={'1rem'}>
@@ -39,7 +47,7 @@ const ChatManagement = () => {
   return (
     <AdminLayout>
       {
-        loading ? <ProgressiveLoader /> : <Table rows={rows} cols={columns} heading={'All Chats'} rowHeight={50} />
+        loading ? <ProgressiveLoader size={"3rem"}/> : <Table rows={rows} cols={columns} heading={'All Chats'} rowHeight={50} />
       }
     </AdminLayout >
   )

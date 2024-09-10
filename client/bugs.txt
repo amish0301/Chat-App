@@ -4,6 +4,3 @@
 3. send request button is not changing after selecting User - ✔️
 4. save notification cnt in localStorage - ✔️
 5. Enhance Profile Pic clarity
-
-amishArtist - u1
-amish0301 - u2

@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
 import { Button, Dialog, DialogTitle, Skeleton, Stack, Typography } from '@mui/material'
-import { sampleUsers } from '../../utils/sampleData'
-import UserItem from '../shared/UserItem'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useAddGroupMembersMutation, useAvailableFriendsQuery } from '../../redux/apis/api'
 import { useAsyncMutation, useXErrors } from '../../hooks/hook'
+import { useAddGroupMembersMutation, useAvailableFriendsQuery } from '../../redux/apis/api'
 import { setIsAddMember } from '../../redux/reducers/misc'
+import UserItem from '../shared/UserItem'
 
 const AddMember = ({ chatId }) => {
     const [selectedMembers, setSelectedMembers] = useState([]);

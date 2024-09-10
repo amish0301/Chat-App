@@ -5,12 +5,15 @@ const { errorHandler } = require("./middlewares/error");
 const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
-const { userSocketIDs } = require("./constants/data");
+const { userSocketIDs, onlineUsers } = require("./constants/data");
 const {
   NEW_MESSAGE,
   NEW_MESSAGE_ALERT,
   START_TYPING,
   STOP_TYPING,
+  CHAT_JOINED,
+  CHAT_LEAVED,
+  ONLINE_USERS,
 } = require("./constants/events");
 const { getSockets } = require("./lib/helper");
 const Message = require("./models/message");
@@ -78,7 +81,6 @@ io.use((socket, next) => {
 
 // Socket-io
 io.on("connection", (socket) => {
-  // console.log("User Connected", socket.id);
   const user = socket.user;
 
   // when user connect map user_id with socket_id
@@ -134,9 +136,24 @@ io.on("connection", (socket) => {
     io.to(membersSocket).emit(STOP_TYPING, { chatId });
   });
 
+  socket.on(CHAT_JOINED, ({ userId, members }) => {
+    onlineUsers.add(userId.toString());
+
+    const memberSocket = getSockets(members);
+    io.to(memberSocket).emit(ONLINE_USERS, Array.from(onlineUsers));
+  });
+
+  socket.on(CHAT_LEAVED, ({ userId, members }) => {
+    onlineUsers.delete(userId.toString());
+
+    const memberSocket = getSockets(members);
+    io.to(memberSocket).emit(ONLINE_USERS, Array.from(onlineUsers));
+  });
+
   socket.on("disconnect", () => {
-    // console.log("User Disconnected", socket.id);
     userSocketIDs.delete(user._id.toString());
+    onlineUsers.delete(user._id.toString());
+    socket.broadcast.emit(ONLINE_USERS, Array.from(onlineUsers));
   });
 });
 

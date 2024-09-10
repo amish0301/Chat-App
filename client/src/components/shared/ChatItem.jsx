@@ -11,8 +11,7 @@ const ChatItem = ({ avatar = [], name, _id, groupChat = false, newMessagesAlert,
         display: 'flex',
         alignItems: 'center',
         padding: '0.5rem',
-        gap: '1rem',
-        backgroundColor: sameSender ? "black" : "unset",
+        backgroundColor: sameSender ? "#015450" : "#e0eaea",
         color: sameSender ? "white" : "unset",
         fontWeight: "bolder",
         position: "relative",
@@ -31,7 +30,7 @@ const ChatItem = ({ avatar = [], name, _id, groupChat = false, newMessagesAlert,
               </div>
             )
           } */}
-          {isOnline && <Typography sx={{ fontSize: '.8rem', color: '#7b9901', fontWeight: 'bolder' }} variant='caption'> Online </Typography>}
+          {isOnline && <Typography sx={{ fontSize: '.8rem', color: '#7b9901', fontWeight: 'bolder', marginTop: '0.3rem' }} variant='caption'> Online </Typography>}
         </Stack>
 
         {/* {

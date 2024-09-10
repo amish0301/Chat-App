@@ -31,7 +31,7 @@ const UserManagement = () => {
   return (
     <AdminLayout>
       {
-        loading ? <ProgressiveLoader /> : <Table rows={rows} cols={columns} heading={'All Users'} rowHeight={50} />
+        loading ? <ProgressiveLoader size={"3rem"}/> : <Table rows={rows} cols={columns} heading={'All Users'} rowHeight={50} />
       }
     </AdminLayout >
   )

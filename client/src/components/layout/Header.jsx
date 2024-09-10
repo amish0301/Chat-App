@@ -1,6 +1,6 @@
 import React, { Suspense, lazy, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { Box, AppBar, Toolbar, Typography, IconButton, Tooltip, Backdrop, Badge } from '@mui/material'
+import { Box, AppBar, Toolbar, Typography, IconButton, Tooltip, Backdrop, Badge, Avatar } from '@mui/material'
 import { orange } from '../styles/color'
 import MenuIcon from '@mui/icons-material/Menu';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
@@ -13,8 +13,10 @@ import { serverURI } from '../../utils/config';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { userNotExists } from '../../redux/reducers/auth';
-import { setIsSearch, setIsMobile, setIsNewGroup, setIsNotification } from '../../redux/reducers/misc';
+import { setIsSearch, setIsMobile, setIsNewGroup, setIsNotification, setIsProfileOpen } from '../../redux/reducers/misc';
 import { resetNotificationCount } from '../../redux/reducers/chat';
+import { transformImage } from '../../lib/feature';
+import Profile from '../Profile';
 
 const SearchDialog = lazy(() => import('../dialogs/SearchDialog'));
 const Notification = lazy(() => import('../dialogs/Notification'));
@@ -35,8 +37,9 @@ const IconBtn = ({ title, icon, onClick, value }) => {
 const Header = () => {
 
     const dispatch = useDispatch();
-    const { isSearch, isNewGroup, isNotification } = useSelector(state => state.utility);
+    const { isSearch, isNewGroup, isNotification, isProfileOpen } = useSelector(state => state.utility);
     const { notificationCount } = useSelector(state => state.chat);
+    const { user } = useSelector(state => state.auth);
 
     const handleMobile = () => dispatch(setIsMobile(true));
     const openSearch = () => dispatch(setIsSearch(true));
@@ -64,7 +67,7 @@ const Header = () => {
     return (
         <>
             <Box sx={{ flexGrow: 1 }} height={'100%'}>
-                <AppBar position='static' sx={{ bgcolor: orange }} >
+                <AppBar position='static' sx={{ bgcolor: '#f80759' }} >
                     <Toolbar>
                         <Typography variant='h6' sx={{ display: { xs: 'none', sm: 'block' }, cursor: 'pointer' }} onClick={navigateToHome}>Talk-A-Tive</Typography>
                         <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
@@ -77,9 +80,12 @@ const Header = () => {
                             <IconBtn title={"Search"} icon={<PersonSearchIcon />} onClick={openSearch} />
                             <IconBtn title={"New Group"} icon={<AddIcon />} onClick={openNewGroup} />
                             <IconBtn title={"My Groups"} icon={<GroupIcon />} onClick={navigateToGroup} />
-                            <IconBtn title={"Notifications"} icon={<NotificationsIcon />} value={notificationCount} onClick={openNotification}/>
+                            <IconBtn title={"Notifications"} icon={<NotificationsIcon />} value={notificationCount} onClick={openNotification} />
                             <IconBtn title={"Logout"} icon={<LogoutIcon />} onClick={logoutHandler} />
                         </Box>
+                        <Tooltip title={"Profile"}>
+                            <Avatar alt="profile_icon" src={transformImage(user?.avatar?.url)} sx={{ ml: 1, cursor: 'pointer', outline: 'none', border: 'none' }} onClick={() => dispatch(setIsProfileOpen(true))} />
+                        </Tooltip>
                     </Toolbar>
                 </AppBar>
             </Box>
@@ -98,6 +104,13 @@ const Header = () => {
             {
                 isNewGroup && (
                     <Suspense fallback={<Backdrop open />}><NewGroup /></Suspense>
+                )
+            }
+            {
+                isProfileOpen && (
+                    <Suspense fallback={<Backdrop open />}>
+                        <Profile user={user} />
+                    </Suspense>
                 )
             }
 

@@ -5,7 +5,7 @@ import { grayColor } from '../components/styles/color';
 
 const Home = () => {
   return (
-    <Box bgcolor={grayColor} height={'100%'}>
+    <Box bgcolor={grayColor} height={'100%'} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Typography p={'2rem'} variant='h5' align='center'>
         Select a friend to chat
       </Typography>

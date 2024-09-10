@@ -7,6 +7,7 @@ const initialState = {
   isMobile: false,
   isSearch: false,
   isFileMenu: false,
+  isProfileOpen: false,
   isDeleteMenu: false,
   uploadingLoader: false,
   showEmojiPicker: false,
@@ -14,6 +15,7 @@ const initialState = {
     groupChat: false,
     chatId: ""
   },
+  onlineUsers: []
 };
 
 const utilitySlice = createSlice({
@@ -50,6 +52,12 @@ const utilitySlice = createSlice({
     setSelectedDeleteChat: (state, action) => {
       state.selectedDeleteChat = action.payload;
     },
+    setOnlineUsers: (state,action) => {
+      state.onlineUsers = action.payload
+    },
+    setIsProfileOpen: (state, action) => {
+      state.isProfileOpen = action.payload
+    }
   },
 });
 
@@ -64,5 +72,7 @@ export const {
   setIsDeleteMenu,
   setUploadingLoader,
   setShowEmojiPicker,
-  setSelectedDeleteChat
+  setSelectedDeleteChat,
+  setOnlineUsers,
+  setIsProfileOpen
 } = utilitySlice.actions;

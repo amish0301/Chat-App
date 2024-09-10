@@ -103,6 +103,7 @@ const getMessages = TryCatch(async (req, res, next) => {
       _id,
       content,
       createdAt,
+      attachments,
       chat: chat._id,
       groupChat: chat.groupChat,
       sender: {
