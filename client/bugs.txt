@@ -1,6 +1,0 @@
-1. auto refresh messages after deleting it.
-    sometimes messages not rendered after deletion.
-2. once i click on notification badge is still visible - ✔️
-3. send request button is not changing after selecting User - ✔️
-4. save notification cnt in localStorage - ✔️
-5. Enhance Profile Pic clarity
