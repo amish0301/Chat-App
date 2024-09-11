@@ -1,14 +1,14 @@
-import React, { Suspense, lazy, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import React, { Suspense, lazy, useEffect } from 'react';
+import { Toaster } from "react-hot-toast";
+import { useDispatch, useSelector } from 'react-redux';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import './App.css';
 import ProtectRoute from './components/auth/ProtectRoute';
 import { LayoutLoader } from './components/layout/Loaders';
-import { serverURI } from './utils/config';
-import { useDispatch, useSelector } from 'react-redux';
 import { setLoading, userExists, userNotExists } from './redux/reducers/auth';
-import toast, { Toaster } from "react-hot-toast";
-import axios from 'axios';
-import './App.css';
 import { SocketProvider } from './socket';
+import { serverURI } from './utils/config';
 
 // importing dynamically whenever we need the component
 const Home = lazy(() => import('./pages/Home'));

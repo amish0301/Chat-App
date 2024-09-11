@@ -66,9 +66,9 @@ app.use(express.static(path.join(__dirname, "build")));
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/admin", adminRoutes);
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
-});
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "build", "index.html"));
+// });
 
 // Middleware for Socket
 io.use((socket, next) => {
@@ -161,7 +161,7 @@ app.use(errorHandler); // Middleware for errors
 
 // default Home Route
 app.get("/", (req, res) => {
-  res.send("Home Page");
+  res.send("Welcome!!");
 });
 
 server.listen(port, () =>
