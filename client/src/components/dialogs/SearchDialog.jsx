@@ -62,9 +62,9 @@ const SearchDialog = () => {
                 <>
                   {
                     users.length > 0 ? (
-                      users?.map(i => i._id !== user._id && <UserItem key={i._id} user={i} addFriendHandler={addFriendHandler} />)
+                      users?.map(i => i._id !== user._id && <UserItem key={i._id} user={i} handler={addFriendHandler} handlerIsLoading={isLoadingSendFreindRequest} />)
                     ) : (
-                      <code style={{ textAlign: 'center' }}>No results found.</code>
+                      <strong style={{ textAlign: 'center' }}>No results found.</strong>
                     )
                   }
                 </>

@@ -74,7 +74,7 @@ const Chat = ({ chatId }) => {
     typingTimeout.current = setTimeout(() => {
       socket.emit(STOP_TYPING, { members, chatId });
       setIamTyping(false);
-    }, [1000]);
+    }, [500]);
   };
 
   const handleFileMenu = (e) => {

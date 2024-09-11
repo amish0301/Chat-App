@@ -63,18 +63,18 @@ const Login = () => {
 
     const handleSignUp = async (e) => {
         e.preventDefault();
-        const toastId = toast.loading("Creating an Account...");
-        setIsLoading(true);
-
+        
         const formData = new FormData();
         formData.append("avatar", avatar.file);
         formData.append("name", name.value);
         formData.append("bio", bio.value);
         formData.append("username", username.value);
         formData.append("password", password.value);
-
+        
         if (!avatar.file) return toast.error("Please upload your profile picture");
-
+        const toastId = toast.loading("Creating an Account...");
+        setIsLoading(true);
+        
         const config = {
             withCredentials: true,
             headers: {
