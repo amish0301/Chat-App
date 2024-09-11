@@ -1,10 +1,10 @@
-import React, { memo } from 'react'
-import { Avatar, Button, CircularProgress, Dialog, DialogTitle, IconButton, List, ListItem, Stack, Typography } from '@mui/material'
-import { Close as CloseIcon, Done as DoneIcon, Close as CancelIcon } from '@mui/icons-material'
-import { useAcceptFriendRequestMutation, useGetNotificationsQuery } from '../../redux/apis/api';
-import { useSelector, useDispatch } from 'react-redux';
+import { Close as CancelIcon, Close as CloseIcon, Done as DoneIcon } from '@mui/icons-material';
+import { Avatar, Button, CircularProgress, Dialog, DialogTitle, IconButton, List, ListItem, Stack, Typography } from '@mui/material';
+import React, { memo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useAsyncMutation, useXErrors } from '../../hooks/hook';
-import { setIsNotification } from '../../redux/reducers/misc'
+import { useAcceptFriendRequestMutation, useGetNotificationsQuery } from '../../redux/apis/api';
+import { setIsNotification } from '../../redux/reducers/misc';
 
 
 const NotificationItem = memo(({ sender, _id, handler }) => {
@@ -41,7 +41,7 @@ const Notification = () => {
 
   const friendRequestHandler = async ({ _id, accept }) => {
     dispatch(setIsNotification(false));
-    await acceptReq("Accepting...", { requestId: _id, accept });
+    await acceptReq(`${accept ? "Accepting..." : "Rejecting..."}`, { requestId: _id, accept });
   }
 
   const handleCloseDialog = () => {
@@ -67,7 +67,7 @@ const Notification = () => {
             data?.requests?.length > 0 ? (
               <List sx={{ maxHeight: '20rem', overflow: 'auto', marginTop: '1rem', width: '100%' }}>
                 {
-                  data.requests.map((noti) => (
+                  data?.requests?.map((noti) => (
                     <NotificationItem key={noti._id} sender={noti.sender} _id={noti._id} handler={friendRequestHandler} />
                   ))
                 }

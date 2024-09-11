@@ -1,11 +1,11 @@
 import { CalendarMonth as CalendarIcon, Close as CloseIcon, Info as InfoIcon, Person as PersonIcon, Phone as PhoneIcon } from '@mui/icons-material';
-import { Avatar, DialogTitle, IconButton, Stack, Typography } from '@mui/material';
+import { Avatar, Dialog, DialogTitle, IconButton, Stack, Typography } from '@mui/material';
 import moment from 'moment';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { transformImage } from '../lib/feature';
 import { setIsProfileOpen } from '../redux/reducers/misc';
-import { CustomBackdrop, StyledDialog } from './styles/StyledComponents';
+import { CustomBackdrop } from './styles/StyledComponents';
 
 const ProfileCard = ({ text, Icon, heading }) => (
     <Stack direction={'row'} alignItems={'center'} spacing={'2rem'} color={'black'}>
@@ -17,7 +17,7 @@ const ProfileCard = ({ text, Icon, heading }) => (
     </Stack>
 );
 
-const Profile = ({ user }) => {
+const Profile = () => {
 
     const textTransform = (sentence) => {
         const texts = sentence.split(' ');
@@ -25,12 +25,22 @@ const Profile = ({ user }) => {
         return str;
     }
     const dispatch = useDispatch();
+    const { user } = useSelector(state => state.auth);
     const { isProfileOpen } = useSelector(state => state.utility);
 
+    const closeHandler = () => {
+        dispatch(setIsProfileOpen(false));
+    }
     return (
-        <StyledDialog
+        <Dialog
+            sx={{
+                backdropFilter: 'blur(20px)',
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+                overflow: 'hidden',
+            }}
             open={isProfileOpen}
-            onClose={() => setIsProfileOpen(false)}
+            onClose={closeHandler}
             fullWidth
             slots={{ backdrop: CustomBackdrop }}
         >
@@ -42,7 +52,7 @@ const Profile = ({ user }) => {
                 <DialogTitle variant="h5">Profile</DialogTitle>
                 <IconButton
                     size="large"
-                    onClick={() => dispatch(setIsProfileOpen(false))}
+                    onClick={closeHandler}
                 >
                     <CloseIcon sx={{ color: 'black', fontSize: '2rem' }} />
                 </IconButton>
@@ -56,7 +66,7 @@ const Profile = ({ user }) => {
                         objectFit: 'contain',
                         marginBottom: '1rem',
                         border: '5px solid white',
-                        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)', // Slight shadow for depth
+                        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
                     }}
                 />
                 <Stack spacing={'2rem'} sx={{ maxWidth: { xs: '100%', md: '70%' }, paddingBottom: '2rem' }}>
@@ -74,11 +84,11 @@ const Profile = ({ user }) => {
                     <ProfileCard
                         Icon={<CalendarIcon />}
                         heading={'Joined'}
-                        text={moment(user.createdAt).fromNow()}
+                        text={moment(user?.createdAt).fromNow()}
                     />
                 </Stack>
             </Stack>
-        </StyledDialog>
+        </Dialog>
 
     )
 }

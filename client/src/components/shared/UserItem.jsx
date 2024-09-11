@@ -7,15 +7,39 @@ const UserItem = ({ user, handler, handlerIsLoading, isAdded = false }) => {
     const { name, _id, avatar } = user;
     return (
         <ListItem>
-            <Stack direction={'row'} spacing={'1rem'} alignItems={'center'} width={'100%'} sx={{
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2 }} alignItems={'center'} width={'100%'} sx={{
                 boxShadow: '0 0 0.5rem rgba(0,0,0,0.2)',
-                padding: '1rem 1rem',
+                padding: { xs: '0.5rem', sm: '1rem' },
                 borderRadius: '1rem',
+                overflow: 'hidden',
             }}>
-                <Avatar src={transformImage(avatar)} />
-                <Typography variant='body1' sx={{ flexGrow: 1, display: '-webkit-flex', WebkitLineClamp: 1, WebkitFlexDirection: 'column', textOverflow: 'ellipsis' }} >{name}</Typography>
+                <Avatar src={transformImage(avatar)} sx={{ width: { xs: 50, sm: 40 }, height: { xs: 50, sm: 40 } }} />
+                <Typography
+                    variant='h6'
+                    sx={{
+                        flexGrow: 1,
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap'
+                    }}
+                >
+                    {name}
+                </Typography>
 
-                <IconButton size='small' sx={{ bgcolor: isAdded ? "error.main" : "primary.main", color: 'white', '&:hover': { bgcolor: isAdded ? 'error.dark' : 'primary.dark' } }} onClick={() => handler(_id)} disabled={handlerIsLoading}>
+                <IconButton
+                    size='small'
+                    sx={{
+                        bgcolor: isAdded ? "error.main" : "primary.main",
+                        color: 'white',
+                        '&:hover': {
+                            bgcolor: isAdded ? 'error.dark' : 'primary.dark'
+                        }
+                    }}
+                    onClick={() => handler(_id)}
+                    disabled={handlerIsLoading}
+                >
                     {isAdded ? <RemoveIcon /> : <AddIcon />}
                 </IconButton>
             </Stack>

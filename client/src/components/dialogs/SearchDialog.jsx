@@ -1,12 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { CircularProgress, Dialog, DialogTitle, IconButton, InputAdornment, List, Stack, TextField } from '@mui/material'
-import { Search as SearchIcon, Close as CloseIcon, FitScreen } from '@mui/icons-material'
 import { useInputValidation } from '6pp'
-import UserItem from '../shared/UserItem'
-import { useSelector, useDispatch } from 'react-redux'
-import { setIsSearch } from '../../redux/reducers/misc'
-import { useLazySearchUserQuery, useSendFriendRequestMutation } from '../../redux/apis/api'
+import { Close as CloseIcon, Search as SearchIcon } from '@mui/icons-material'
+import { Dialog, DialogTitle, IconButton, InputAdornment, List, Stack, TextField } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useAsyncMutation } from '../../hooks/hook'
+import { useLazySearchUserQuery, useSendFriendRequestMutation } from '../../redux/apis/api'
+import { setIsSearch } from '../../redux/reducers/misc'
+import { ProgressiveLoader } from '../layout/Loaders'
+import UserItem from '../shared/UserItem'
 
 const SearchDialog = () => {
   const dispatch = useDispatch();
@@ -19,7 +20,7 @@ const SearchDialog = () => {
   const search = useInputValidation("");
   const addFriendHandler = async (id) => {
     await sendFriendRequest("Sending Friend request...", { receiverId: id });
-  };
+  }
 
   const closeDialog = () => dispatch(setIsSearch(false));
 
@@ -32,8 +33,8 @@ const SearchDialog = () => {
   }, [search.value])
 
   return (
-    <Dialog open={isSearch} onClose={closeDialog}>
-      <Stack p={'2rem'} sx={{ width: { sm: '30rem', xs: '100%' } }}>
+    <Dialog open={isSearch} onClose={closeDialog} maxWidth="sm" fullWidth>
+      <Stack p={'2rem'} sx={{ width: '100%', height: '70vh' }}>
         <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <DialogTitle textAlign={'center'}>Find People</DialogTitle>
           <IconButton size='medium' onClick={closeDialog}>
@@ -41,19 +42,36 @@ const SearchDialog = () => {
           </IconButton>
         </Stack>
 
-        <TextField value={search.value} onChange={search.changeHandler} variant='outlined' size='small' InputProps={{
-          startAdornment: (<InputAdornment position='start'><SearchIcon /></InputAdornment>),
-        }} />
+        <TextField
+          value={search.value}
+          onChange={search.changeHandler}
+          variant='outlined'
+          size='small'
+          InputProps={{
+            startAdornment: (<InputAdornment position='start'><SearchIcon /></InputAdornment>),
+          }}
+        />
 
         {/* Search results */}
-        <List sx={{ maxHeight: '30rem', overflow: 'auto', marginTop: '1rem' }}>
-          {
-            isLoading ? <Stack alignItems={'center'} justifyContent={'center'}><CircularProgress /></Stack> :
-            users?.map((i) => (
-              i._id !== user._id && <UserItem user={i} key={i._id} handler={addFriendHandler} handlerIsLoading={isLoadingSendFreindRequest} />
-            ))
-          }
-        </List>
+        <Stack sx={{ marginTop: '2rem', height: 'calc(100% - 2rem)', overflowY: 'auto' }}>
+          <List>
+            {
+              isLoading ? (
+                <ProgressiveLoader />
+              ) : (
+                <>
+                  {
+                    users.length > 0 ? (
+                      users?.map(i => i._id !== user._id && <UserItem key={i._id} user={i} addFriendHandler={addFriendHandler} />)
+                    ) : (
+                      <code style={{ textAlign: 'center' }}>No results found.</code>
+                    )
+                  }
+                </>
+              )
+            }
+          </List>
+        </Stack>
       </Stack>
     </Dialog>
   )

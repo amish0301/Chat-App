@@ -1,4 +1,4 @@
-import { Drawer, Grid, Skeleton } from '@mui/material';
+import { Grid, Skeleton, SwipeableDrawer } from '@mui/material';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -11,7 +11,6 @@ import { setIsDeleteMenu, setIsMobile, setOnlineUsers, setSelectedDeleteChat } f
 import { getSocket } from '../../socket';
 import ChatList from '../ChatList';
 import DeleteChatMenu from '../dialogs/DeleteChatMenu';
-import Profile from '../Profile';
 import Title from '../shared/Title';
 import Header from './Header';
 
@@ -27,7 +26,6 @@ const AppLayout = () => (WrappedComponent) => {
         const socket = getSocket();
 
         const { isMobile, onlineUsers } = useSelector(state => state.utility);
-        const { user } = useSelector(state => state.auth);
         const { newMessagesAlert } = useSelector(state => state.chat);
 
         // all below destructured data is provided by default RTK query
@@ -89,17 +87,17 @@ const AppLayout = () => (WrappedComponent) => {
                     <Grid item xs={12} sm={8} md={9} lg={9} height={"100%"}>
                         <WrappedComponent {...props} chatId={chatId} />
                     </Grid>
-                    <Grid item md={4} lg={3} sx={{ display: { xs: 'none', md: 'none' }, padding: '1rem', bgcolor: '#c06c84' }} height={"100%"}>
-                        <Profile user={user} />
-                    </Grid>
+                    {/* <Grid item md={4} lg={3} sx={{ display: { xs: 'none', md: 'none' }, padding: '1rem', bgcolor: '#c06c84' }} height={"100%"}>
+                        <Profile />
+                    </Grid> */}
                 </Grid>
 
                 {/* Mobile Screen */}
                 {
                     isLoading ? (<Skeleton />) : (
-                        <Drawer open={isMobile} onClose={handleMobileClose}>
+                        <SwipeableDrawer anchor="left" open={isMobile} onOpen={() => dispatch(setIsMobile(true))} variant='temporary' onClose={handleMobileClose}>
                             <ChatList w='70vw' chats={data?.chats} chatId={chatId} newMessagesAlert={newMessagesAlert} onlineUsers={onlineUsers} handleDeleteChat={handleDeleteChat} />
-                        </Drawer>
+                        </SwipeableDrawer>
                     )
                 }
             </>

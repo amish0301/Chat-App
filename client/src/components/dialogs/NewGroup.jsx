@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Dialog, DialogTitle, IconButton, List, Skeleton, Stack, TextField, Typography } from '@mui/material'
 import { Close as CloseIcon } from '@mui/icons-material'
 import UserItem from '../shared/UserItem'
@@ -6,7 +6,7 @@ import { useInputValidation } from '6pp';
 import { useAvailableFriendsQuery, useNewGroupMutation } from '../../redux/apis/api'
 import { useAsyncMutation, useXErrors } from '../../hooks/hook'
 import { useDispatch, useSelector } from 'react-redux';
-import { setIsNewGroup } from '../../redux/reducers/misc';
+import { setIsMobile, setIsNewGroup } from '../../redux/reducers/misc';
 import toast from 'react-hot-toast';
 
 
@@ -44,39 +44,47 @@ const NewGroup = () => {
   const closeHandler = () => dispatch(setIsNewGroup(false));
 
   return (
-    <Dialog open={isNewGroup} onClose={closeHandler}>
-      <Stack p={{ xs: '1rem', sm: '3rem' }} maxWidth={'25rem'} spacing={'1rem'}>
+    <Dialog open={isNewGroup} onClose={closeHandler} maxWidth='sm' fullWidth>
+      <Stack p={{ xs: '1rem', sm: '2rem', md: '3rem' }} spacing={'1rem'} >
         <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'}>
-          <DialogTitle variant='h5'>New Group</DialogTitle>
+          <DialogTitle variant='h6' fontWeight={'bold'} marginX={'-1rem'}>New Group</DialogTitle>
           <IconButton size='medium' onClick={closeHandler}>
             <CloseIcon />
           </IconButton>
         </Stack>
 
-        <TextField label="Group Name" variant='outlined' size='medium' value={groupName.value} onChange={groupName.changeHandler} />
+        <TextField
+          label="Group Name"
+          variant='outlined'
+          size='small'
+          fullWidth
+          value={groupName.value}
+          onChange={groupName.changeHandler}
+        />
 
         <Typography align='left' variant='body1' marginBottom={'.5rem'}>
           {
-            data?.friends?.length ? "Add Members" : "No Members Found"
+            data?.friends?.length ? "" : "No Members Found"
           }
         </Typography>
 
-        {/* group list */}
-        {
-          <List sx={{ maxHeight: '15rem', overflow: 'auto' }}>
-            {
-              isLoading ? <Skeleton variant='rectangular' height={40} /> : data?.friends?.map((user) => (
+        {/* Group list */}
+        <List sx={{ maxHeight: '20rem', overflowY: 'auto' }}>
+          {
+            isLoading ? (
+              <Skeleton variant='rectangular' height={40} />
+            ) : (
+              data?.friends?.map((user) => (
                 <UserItem user={user} key={user._id} handler={selectMemberHandler} isAdded={selectedMembers.includes(user._id)} />
               ))
-            }
-          </List>
-        }
+            )
+          }
+        </List>
 
-        <Stack direction={'row'} justifyContent={'space-between'}>
+        <Stack direction={'row'} spacing={1} justifyContent={'space-between'}>
           <Button variant='text' color='error' size='large' onClick={closeHandler}>Cancel</Button>
           <Button variant='contained' size='large' onClick={submitHandler} disabled={isLoadingNewGroup}>Create</Button>
         </Stack>
-
       </Stack>
     </Dialog>
   )
