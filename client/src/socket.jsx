@@ -1,12 +1,12 @@
 import { createContext, useContext, useMemo } from "react";
-import io from "socket.io-client";
+import { io } from "socket.io-client";
 import { serverURI } from "./utils/config";
 
 const SocketContext = createContext();
 const getSocket = () => useContext(SocketContext);
 
 const SocketProvider = ({ children }) => {
-    const socket = useMemo(() => io(serverURI, { withCredentials: true }), []);
+    const socket = useMemo(() => io(serverURI, { withCredentials: true, transports: ['websocket'] }), []);
 
     return (
         <SocketContext.Provider value={socket}>
