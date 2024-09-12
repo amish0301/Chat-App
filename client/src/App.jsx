@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
 import ProtectRoute from './components/auth/ProtectRoute';
-import { LayoutLoader } from './components/layout/Loaders';
+import { LayoutLoader, ProgressiveLoader } from './components/layout/Loaders';
 import { setLoading, userExists, userNotExists } from './redux/reducers/auth';
 import { SocketProvider } from './socket';
 import { serverURI } from './utils/config';
@@ -49,6 +49,7 @@ const App = () => {
     if(!user) checkUser();
   }, [user]);
 
+  if(!user && !loader) return <ProgressiveLoader h={'100vh'}/>;
 
   return loader ? <LayoutLoader /> : (
     <BrowserRouter>

@@ -97,9 +97,9 @@ export const GroupsLayoutLoader = () => {
     );
 }
 
-export const ProgressiveLoader = () => {
+export const ProgressiveLoader = ({ h = '100%' }) => {
     return (
-        <Stack alignItems={'center'} justifyContent={'center'} height={'100%'}>
+        <Stack alignItems={'center'} justifyContent={'center'} height={h}>
             <CircularProgress />
         </Stack>
     )
