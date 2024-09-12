@@ -13,7 +13,7 @@ import { TypingLoader } from '../components/layout/Loaders';
 import MessageComponent from '../components/shared/MessageComponent';
 import { grayColor, orange } from '../components/styles/color';
 import { InputBox } from '../components/styles/StyledComponents';
-import { ALERT, CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, START_TYPING, STOP_TYPING } from '../constants/events';
+import { ALERT, CHAT_JOINED, CHAT_LEAVED, MESSAGE_DELETE, NEW_MESSAGE, START_TYPING, STOP_TYPING } from '../constants/events';
 import { useAsyncMutation, useSocketEvents, useXErrors } from '../hooks/hook';
 import { useChatDetailsQuery, useDeleteMessageMutation, useGetMessagesQuery } from '../redux/apis/api';
 import { removeNewMessagesAlert } from '../redux/reducers/chat';
@@ -144,6 +144,13 @@ const Chat = ({ chatId }) => {
     [chatId]
   );
 
+  const messageDeleteListener = useCallback(data => {
+    if(data.chatId !== chatId) return;
+
+    setMessages((prev) => prev.filter((msg) => msg._id !== data.messageId));
+    setOldMessages((prev) => prev.filter((msg) => msg._id !== data.messageId));
+  }, [chatId])
+
   // Admin Message
   const alertListener = useCallback(
     (data) => {
@@ -169,6 +176,7 @@ const Chat = ({ chatId }) => {
     [NEW_MESSAGE]: newMessagesListener,
     [START_TYPING]: startTypingListener,
     [STOP_TYPING]: stopTypingListener,
+    [MESSAGE_DELETE]: messageDeleteListener
   };
 
   // Event Listeners
@@ -178,13 +186,12 @@ const Chat = ({ chatId }) => {
 
   const handleDeleteMessage = (messageId) => {
     deleteMessageRequest("Deleting Message...", { chatId, messageId });
-    setOldMessages((prev) => prev.filter((msg) => msg._id !== messageId));
   };
 
   const allMessages = [...oldMessages, ...messages];
 
   return chatDetails.isLoading ? (
-    <Skeleton />
+    <Skeleton variant="rectangular" width={'100%'} height={'100%'} />
   ) : (
     <Fragment>
       <Stack ref={containerRef} boxSizing={'border-box'} padding={'1rem'} spacing={'1rem'} bgcolor={grayColor} height={'90%'} sx={{ overflowX: 'hidden', overflowY: 'auto' }}>

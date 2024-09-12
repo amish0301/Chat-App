@@ -21,7 +21,7 @@ const Profile = () => {
 
     const textTransform = (sentence) => {
         const texts = sentence.split(' ');
-        const str = texts.map(word => word[0].toUpperCase() + word.slice(1)).join(' ');
+        const str = texts.map(word => word[0]?.toUpperCase() + word.slice(1)).join(' ');
         return str;
     }
     const dispatch = useDispatch();

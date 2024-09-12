@@ -6,20 +6,17 @@ export const LayoutLoader = () => {
     return (
         <>
             <Grid container height={"calc(100vh - 4rem)"} spacing={'1rem'}>
-                <Grid item sm={4} md={3} sx={{ display: { xs: 'none', sm: 'block' } }} height={"100%"}>
+                <Grid item sm={4} md={3} sx={{ display: { xs: 'none', sm: 'block' } }} height={"100vh"}>
                     <Stack spacing={'1rem'}>
                         {
-                            Array.from({ length: 10 }).map((_, index) => {
+                            Array.from({ length: 20 }).map((_, index) => {
                                 <Skeleton key={index} variant="rounded" height={'5rem'} />
                             })
                         }
                     </Stack>
                 </Grid>
-                <Grid item xs={12} sm={8} md={5} lg={6} height={"100%"}>
-                    <Skeleton variant="rectangular" />
-                </Grid>
-                <Grid item md={4} lg={3} sx={{ display: { xs: 'none', md: 'block' } }} height={"100%"}>
-                    <Skeleton variant="rectangular" height={'100vh'} />
+                <Grid item xs={12} sm={8} md={10} lg={12} height={"5rem"}>
+                    <Skeleton variant="rectangular" height={'100%'} />
                 </Grid>
             </Grid>
         </>
@@ -102,8 +99,8 @@ export const GroupsLayoutLoader = () => {
 
 export const ProgressiveLoader = () => {
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            <CircularProgress size={"3rem"} color="secondary"/>
-        </Box>
+        <Stack alignItems={'center'} justifyContent={'center'} height={'100%'}>
+            <CircularProgress />
+        </Stack>
     )
 }

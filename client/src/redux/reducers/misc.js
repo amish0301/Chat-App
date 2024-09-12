@@ -6,10 +6,12 @@ const initialState = {
   isNotification: false,
   isMobile: false,
   isSearch: false,
+  isLogin: true,
   isFileMenu: false,
   isProfileOpen: false,
   isDeleteMenu: false,
   uploadingLoader: false,
+  isShowPassword: false,
   showEmojiPicker: false,
   selectedDeleteChat: {
     groupChat: false,
@@ -57,6 +59,12 @@ const utilitySlice = createSlice({
     },
     setIsProfileOpen: (state, action) => {
       state.isProfileOpen = action.payload
+    },
+    setIsShowPassword: (state, action) => {
+      state.isShowPassword = action.payload
+    },
+    setIsLogin: (state, action) => {
+      state.isLogin = action.payload
     }
   },
 });
@@ -74,5 +82,7 @@ export const {
   setShowEmojiPicker,
   setSelectedDeleteChat,
   setOnlineUsers,
-  setIsProfileOpen
+  setIsProfileOpen,
+  setIsShowPassword,
+  setIsLogin
 } = utilitySlice.actions;

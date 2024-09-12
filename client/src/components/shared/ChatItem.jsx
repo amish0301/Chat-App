@@ -1,8 +1,8 @@
-import React, { memo } from 'react'
+import { Badge, Stack, Typography } from '@mui/material';
+import { motion } from "framer-motion";
+import React, { memo } from 'react';
 import { Link } from '../styles/StyledComponents';
-import { Badge, Box, Stack, Typography } from '@mui/material';
 import AvatarCard from './AvatarCard';
-import { motion } from "framer-motion"
 
 const ChatItem = ({ avatar = [], name, _id, groupChat = false, newMessagesAlert, sameSender, isOnline, index = 0, handleDeleteChat }) => {
   return (
@@ -21,7 +21,7 @@ const ChatItem = ({ avatar = [], name, _id, groupChat = false, newMessagesAlert,
         <AvatarCard avatar={avatar} groupChat={groupChat} />
 
         <Stack>
-          <Typography>{name}</Typography>
+          <Typography textTransform={groupChat ? 'none' : 'capitalize'}>{name}</Typography>
           {newMessagesAlert && <Badge badgeContent={newMessagesAlert.messageCnt} color="primary" sx={{ position: 'absolute', top: '50%', right: '1.2rem' }} />}
           {isOnline && <Typography sx={{ fontSize: '.8rem', color: '#7b9901', fontWeight: 'bolder', marginTop: '0.3rem' }} variant='caption'> Online </Typography>}
         </Stack>

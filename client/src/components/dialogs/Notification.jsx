@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useAsyncMutation, useXErrors } from '../../hooks/hook';
 import { useAcceptFriendRequestMutation, useGetNotificationsQuery } from '../../redux/apis/api';
 import { setIsNotification } from '../../redux/reducers/misc';
+import { ProgressiveLoader } from '../layout/Loaders';
 
 
 const NotificationItem = memo(({ sender, _id, handler }) => {
@@ -52,8 +53,8 @@ const Notification = () => {
   useXErrors([{ isError, error }]);
 
   return (
-    <Dialog open={isNotification} onClose={handleCloseDialog}>
-      <Stack p={{ xs: '1rem', sm: '2rem' }} sx={{ width: { sm: '30rem', xs: '100%' } }}>
+    <Dialog open={isNotification} onClose={handleCloseDialog} fullWidth>
+      <Stack p={{ xs: '1rem', sm: '2rem' }} width={'100%'}>
         <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <DialogTitle textAlign={'center'}>Notifications</DialogTitle>
           <IconButton size='medium' onClick={handleCloseDialog}>
@@ -63,7 +64,7 @@ const Notification = () => {
 
         {/* Notifiacations list */}
         {
-          isLoading ? <Stack alignItems={'center'} justifyContent={'center'}><CircularProgress /></Stack> :
+          isLoading ? <Stack alignItems={'center'} justifyContent={'center'}><ProgressiveLoader /></Stack> :
             data?.requests?.length > 0 ? (
               <List sx={{ maxHeight: '20rem', overflow: 'auto', marginTop: '1rem', width: '100%' }}>
                 {

@@ -12,7 +12,6 @@ import UserItem from '../shared/UserItem'
 const SearchDialog = () => {
   const dispatch = useDispatch();
   const { isSearch } = useSelector(state => state.utility);
-  const { user } = useSelector(state => state.auth);
   const [searchUser, { isLoading }] = useLazySearchUserQuery();
   const [sendFriendRequest, isLoadingSendFreindRequest] = useAsyncMutation(useSendFriendRequestMutation);
   const [users, setUsers] = useState([]);
@@ -34,9 +33,9 @@ const SearchDialog = () => {
 
   return (
     <Dialog open={isSearch} onClose={closeDialog} maxWidth="sm" fullWidth>
-      <Stack p={'2rem'} sx={{ width: '100%', height: '70vh' }}>
+      <Stack p={'1.5rem'} sx={{ width: '100%', height: '70vh' }}>
         <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <DialogTitle textAlign={'center'}>Find People</DialogTitle>
+          <DialogTitle textAlign={'center'} sx={{ fontWeight: 'bolder', padding: '1.5rem 0' }}>Find People</DialogTitle>
           <IconButton size='medium' onClick={closeDialog}>
             <CloseIcon />
           </IconButton>
@@ -53,7 +52,7 @@ const SearchDialog = () => {
         />
 
         {/* Search results */}
-        <Stack sx={{ marginTop: '2rem', height: 'calc(100% - 2rem)', overflowY: 'auto' }}>
+        <Stack sx={{ marginTop: '2rem', height: { sm: 'calc(100% - 3rem)', xs: '100%'}, overflowY: 'auto' }}>
           <List>
             {
               isLoading ? (
@@ -61,10 +60,10 @@ const SearchDialog = () => {
               ) : (
                 <>
                   {
-                    users.length > 0 ? (
-                      users?.map(i => i._id !== user._id && <UserItem key={i._id} user={i} handler={addFriendHandler} handlerIsLoading={isLoadingSendFreindRequest} />)
+                    users?.length ? (
+                      users?.map(i => <UserItem key={i._id} user={i} handler={addFriendHandler} handlerIsLoading={isLoadingSendFreindRequest} />)
                     ) : (
-                      <strong style={{ textAlign: 'center' }}>No results found.</strong>
+                      <strong style={{ width: '100%', marginLeft: '1rem' }}>No results found.</strong>
                     )
                   }
                 </>
