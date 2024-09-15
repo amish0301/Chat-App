@@ -133,7 +133,7 @@ const api = createApi({
         url: `/chat/${chatId}`,
         method: "PUT",
         credentials: "include",
-        body: name,
+        body: {name},
       }),
       invalidatesTags: ["Chat"],
     }),

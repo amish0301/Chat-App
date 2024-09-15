@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import { Button, Dialog, DialogTitle, IconButton, List, Skeleton, Stack, TextField, Typography } from '@mui/material'
-import { Close as CloseIcon } from '@mui/icons-material'
-import UserItem from '../shared/UserItem'
 import { useInputValidation } from '6pp';
-import { useAvailableFriendsQuery, useNewGroupMutation } from '../../redux/apis/api'
-import { useAsyncMutation, useXErrors } from '../../hooks/hook'
-import { useDispatch, useSelector } from 'react-redux';
-import { setIsMobile, setIsNewGroup } from '../../redux/reducers/misc';
+import { Close as CloseIcon } from '@mui/icons-material';
+import { Button, Dialog, DialogTitle, IconButton, List, Skeleton, Stack, TextField, Typography } from '@mui/material';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { useAsyncMutation, useXErrors } from '../../hooks/hook';
+import { useAvailableFriendsQuery, useNewGroupMutation } from '../../redux/apis/api';
+import { setIsNewGroup } from '../../redux/reducers/misc';
+import UserItem from '../shared/UserItem';
 
 
 const NewGroup = () => {
@@ -15,8 +15,7 @@ const NewGroup = () => {
   const groupName = useInputValidation("");
   const dispatch = useDispatch();
   const { isNewGroup } = useSelector(state => state.utility);
-
-  // BUG - send ChatId in below query 
+ 
   const { isLoading, data, isError, error } = useAvailableFriendsQuery();
   const [newGroup, isLoadingNewGroup] = useAsyncMutation(useNewGroupMutation);
 
@@ -32,11 +31,11 @@ const NewGroup = () => {
     );
   };
 
-  const submitHandler = () => {
+  const submitHandler = async () => {
     if (!groupName.value) return toast.error("Enter Group Name");
-    if (selectedMembers.length < 3) return toast.error("Please add atleast 2 members");
+    if (selectedMembers.length < 2) return toast.error("Please add atleast 2 members");
 
-    newGroup("Creating New Group...", { name: groupName.value, members: selectedMembers });
+    await newGroup("Creating New Group...", { name: groupName.value, members: selectedMembers });
     closeHandler();
   }
 

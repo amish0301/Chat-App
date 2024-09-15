@@ -16,7 +16,7 @@ import { userNameValidator } from '../utils/validator';
 
 const Login = () => {
     const dispatch = useDispatch();
-    const {  isLogin, isShowPassword } = useSelector(state => state.utility);
+    const { isLogin, isShowPassword } = useSelector(state => state.utility);
     const [isLoading, setIsLoading] = useState(false);
 
     const name = useInputValidation("");

@@ -1,6 +1,6 @@
-import React from "react";
-import { Grid, Skeleton, Stack, Box, CircularProgress } from "@mui/material";
+import { Box, CircularProgress, Grid, Skeleton, Stack } from "@mui/material";
 import { motion } from "framer-motion";
+import React from "react";
 
 export const LayoutLoader = () => {
     return (

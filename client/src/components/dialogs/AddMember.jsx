@@ -37,7 +37,6 @@ const AddMember = ({ chatId }) => {
         closeHandler();
     }
 
-
     return (
         <Dialog open={isAddMember} onClose={closeHandler}>
             <Stack p={'2rem'} maxWidth={'25rem'} spacing={'1rem'}>

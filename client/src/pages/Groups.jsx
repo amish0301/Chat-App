@@ -1,15 +1,15 @@
-import React, { Suspense, lazy, memo, useEffect, useState } from 'react'
-import { Backdrop, Box, Button, CircularProgress, Drawer, Grid, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material'
-import { matBlack } from '../components/styles/color'
-import { Menu as MenuIcon, KeyboardBackspace as BackIcon, Edit as EditIcon, Done as DoneIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Link } from '../components/styles/StyledComponents';
+import { Add as AddIcon, KeyboardBackspace as BackIcon, Delete as DeleteIcon, Done as DoneIcon, Edit as EditIcon, Menu as MenuIcon } from '@mui/icons-material';
+import { Backdrop, Box, Button, CircularProgress, Drawer, Grid, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import React, { Suspense, lazy, memo, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { GroupsLayoutLoader } from '../components/layout/Loaders';
 import AvatarCard from '../components/shared/AvatarCard';
 import UserItem from '../components/shared/UserItem';
-import { useChatDetailsQuery, useDeleteChatMutation, useMyGroupsQuery, useRemoveGroupMemberMutation, useRenameGroupMutation } from '../redux/apis/api';
+import { matBlack } from '../components/styles/color';
+import { Link } from '../components/styles/StyledComponents';
 import { useAsyncMutation, useXErrors } from '../hooks/hook';
-import { GroupsLayoutLoader } from '../components/layout/Loaders';
-import { useDispatch, useSelector } from 'react-redux';
+import { useChatDetailsQuery, useDeleteChatMutation, useMyGroupsQuery, useRemoveGroupMemberMutation, useRenameGroupMutation } from '../redux/apis/api';
 import { setIsAddMember } from '../redux/reducers/misc';
 
 const ConfirmDeleteDialog = lazy(() => import('../components/dialogs/ConfirmDeleteDialog'));
@@ -57,6 +57,10 @@ const Groups = () => {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [groupMembers, setGroupMembers] = useState([]);
+  const [isEdit, setIsEdit] = useState(false);
+  const [groupName, setGroupName] = useState("");
+  const [groupNameUpdatedValue, setGroupNameUpdatedValue] = useState("");
+  const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false);
 
   const handleMobile = () => {
     setIsMobileMenuOpen(prev => !prev)
@@ -64,11 +68,6 @@ const Groups = () => {
   const handleMobileClose = () => {
     setIsMobileMenuOpen(false);
   }
-
-  const [isEdit, setIsEdit] = useState(false);
-  const [groupName, setGroupName] = useState("");
-  const [groupNameUpdatedValue, setGroupNameUpdatedValue] = useState("");
-  const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false);
 
   const errors = [
     {
@@ -86,7 +85,7 @@ const Groups = () => {
     {
       isError: removeMember.isError,
       error: removeMember.error,
-    },
+    }
   ];
 
   // Error Handler
@@ -96,9 +95,9 @@ const Groups = () => {
     const groupData = groupDetails.data;
 
     if (groupData) {
-      setGroupMembers(groupData.chat.members)
-      setGroupNameUpdatedValue(groupData.chat.name)
       setGroupName(groupData.chat.name)
+      setGroupNameUpdatedValue(groupData.chat.name)
+      setGroupMembers(groupData.chat.members)
     }
 
     return () => {
@@ -127,7 +126,7 @@ const Groups = () => {
   const deleteHandler = () => {
     deleteGroup("Deleting Group...", chatId);
     closeConfirmDeleteDialog();
-    navigate('/groups'); 
+    navigate('/groups');
   };
 
   // to ADD Members
@@ -178,8 +177,11 @@ const Groups = () => {
           </>
         ) : (
           <>
-            <Typography variant='h5'>{groupName}</Typography>
-            <IconButton onClick={() => setIsEdit(true)} disabled={isLoadingGroupName}>
+            <Typography variant="h4">{groupName}</Typography>
+            <IconButton
+              disabled={isLoadingGroupName}
+              onClick={() => setIsEdit(true)}
+            >
               <EditIcon />
             </IconButton>
           </>
@@ -194,7 +196,7 @@ const Groups = () => {
     </Stack>
   );
 
-  return myGroups?.isLoading ? <GroupsLayoutLoader /> : (
+  return myGroups.isLoading ? <GroupsLayoutLoader /> : (
     <Grid container height={'100vh'}>
       <Grid item sx={{ display: { xs: 'none', sm: 'block' } }} sm={4}>
         <GroupsList myGroups={myGroups?.data?.groups} chatId={chatId} />
@@ -209,8 +211,10 @@ const Groups = () => {
               <Stack maxWidth={'45rem'} width={'100%'} boxSizing={'border-box'} padding={{ sm: '1rem', xs: '0', md: '1rem 4rem' }} spacing={'2rem'} height={'50vh'} bgcolor={'rgba(0,0,0,0.1)'} overflow={'auto'}>
                 {/* Members List */}
                 {
-                  isLoadingRemoveMember ? <CircularProgress /> : groupMembers?.map((user) => (
-                    <UserItem key={user._id} user={user} isAdded handler={removeMemberHandler}  />
+                  isLoadingRemoveMember ? (
+                    <CircularProgress />
+                  ) : groupMembers?.map((user) => (
+                    <UserItem key={user._id} user={user} isAdded handler={removeMemberHandler} />
                   ))
                 }
               </Stack>
