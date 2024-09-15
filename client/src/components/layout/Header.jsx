@@ -64,22 +64,35 @@ const Header = () => {
             dispatch(userNotExists());
         } catch (error) {
             toast.error(error?.response?.data?.message || "Something went wrong", { id: toastId });
-        }finally {
+        } finally {
             dispatch(setLoading(false));
         }
     }
 
-    if(loader) return <ProgressiveLoader />;
+    if (loader) return <ProgressiveLoader />;
 
     return (
         <>
             <Box sx={{ height: '100%', display: 'flex', flexGrow: 1 }}>
                 <AppBar position='static' sx={{ bgcolor: '#f80759' }} >
-                    <Toolbar sx={{ display: 'flex', justifyContent: 'space-between'}}>
+                    <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <Typography
                                 variant="h6"
-                                sx={{ display: { xs: 'none', sm: 'block' }, cursor: 'pointer' }}
+                                sx={{
+                                    display: { xs: 'none', sm: 'block' },
+                                    fontSize: { xs: '1.2rem', sm: '1.5rem', md: '2rem' },
+                                    fontFamily: 'Poppins, sans-serif',
+                                    background: 'linear-gradient(90deg, #ff6f61, #ff8961)', 
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    cursor: 'pointer',
+                                    fontWeight: 'bold', 
+                                    transition: 'transform 0.3s ease', 
+                                    '&:hover': {
+                                        transform: 'scale(1.05)', 
+                                    }
+                                }}
                                 onClick={navigateToHome}
                             >
                                 Talk-A-Tive
@@ -102,7 +115,7 @@ const Header = () => {
                             <IconBtn title={"Logout"} icon={<LogoutIcon />} onClick={logoutHandler} />
                         </Box>
                         <Tooltip title={"Profile"}>
-                            <Avatar alt="profile_icon" src={transformImage(user?.avatar?.url)} sx={{ ml: 1, cursor: 'pointer', outline: 'none', border: 'none', width: {xs: '30px', sm: '35px'}, height: {xs: '30px', sm: '35px'} }} onClick={() => dispatch(setIsProfileOpen(true))} />
+                            <Avatar alt="profile_icon" src={transformImage(user?.avatar?.url)} sx={{ ml: 1, cursor: 'pointer', outline: 'none', border: 'none', width: { xs: '30px', sm: '35px' }, height: { xs: '30px', sm: '35px' } }} onClick={() => dispatch(setIsProfileOpen(true))} />
                         </Tooltip>
                     </Toolbar>
                 </AppBar>

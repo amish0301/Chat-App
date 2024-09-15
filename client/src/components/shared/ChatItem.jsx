@@ -11,10 +11,11 @@ const ChatItem = ({ avatar = [], name, _id, groupChat = false, newMessagesAlert,
         display: 'flex',
         alignItems: 'center',
         padding: '0.5rem',
-        backgroundColor: sameSender ? "#015450" : "#e0eaea",
+        backgroundColor: sameSender ? "#015450" : "#f5f5f5",
         color: sameSender ? "white" : "unset",
         fontWeight: "bolder",
         position: "relative",
+        // e0eaea
       }}>
 
         {/* profile pic */}

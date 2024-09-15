@@ -1,4 +1,4 @@
-import { Grid, Skeleton, SwipeableDrawer } from '@mui/material';
+import { Grid, Skeleton, Stack, SwipeableDrawer, Typography } from '@mui/material';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -92,6 +92,15 @@ const AppLayout = () => (WrappedComponent) => {
                 {
                     isLoading ? (<Skeleton height={'100vh'} />) : (
                         <SwipeableDrawer anchor="left" open={isMobile} onOpen={() => dispatch(setIsMobile(true))} variant='temporary' onClose={handleMobileClose}>
+                            <Stack direction={'row'} alignItems='center' spacing={3} p={2}>
+                                <Typography variant='h5' color={'black'} sx={{
+                                    flexGrow: 1, fontWeight: 'bold', fontFamily
+                                        : 'Poppins, sans-serif',
+                                    background: 'linear-gradient(90deg, #ff6f61, #ff8961)',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                }}>Talk-a-Tive</Typography>
+                            </Stack>
                             <ChatList w='75vw' chats={data?.chats} chatId={chatId} newMessagesAlert={newMessagesAlert} onlineUsers={onlineUsers} handleDeleteChat={handleDeleteChat} />
                         </SwipeableDrawer>
                     )
