@@ -81,17 +81,13 @@ const Header = () => {
                                 variant="h6"
                                 sx={{
                                     display: { xs: 'none', sm: 'block' },
-                                    fontSize: { xs: '1.2rem', sm: '1.5rem', md: '2rem' },
+                                    fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.6rem' },
                                     fontFamily: 'Poppins, sans-serif',
                                     background: 'linear-gradient(90deg, #ff6f61, #ff8961)', 
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     cursor: 'pointer',
                                     fontWeight: 'bold', 
-                                    transition: 'transform 0.3s ease', 
-                                    '&:hover': {
-                                        transform: 'scale(1.05)', 
-                                    }
                                 }}
                                 onClick={navigateToHome}
                             >

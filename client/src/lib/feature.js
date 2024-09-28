@@ -35,12 +35,36 @@ const getLast7Days = () => {
   return last7Days;
 };
 
-const getOrSaveFromStorage = ({key, value, get}) => {
-  if(get) {
-    return localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : null;
+const getAddress = (data) => {
+  const formattedAddress = [
+    data?.house_number,
+    data?.road,
+    data?.neighbourhood,
+    data?.suburb,
+    data?.city,
+    data?.state,
+    data?.postcode,
+    data?.country,
+  ]
+    .filter(Boolean)
+    .join(", ");
+  return formattedAddress;
+};
+
+const getOrSaveFromStorage = ({ key, value, get }) => {
+  if (get) {
+    return localStorage.getItem(key)
+      ? JSON.parse(localStorage.getItem(key))
+      : null;
   }
 
   localStorage.setItem(key, JSON.stringify(value));
 };
 
-export { fileFormat, transformImage, getLast7Days, getOrSaveFromStorage };
+export {
+  fileFormat,
+  transformImage,
+  getLast7Days,
+  getOrSaveFromStorage,
+  getAddress,
+};

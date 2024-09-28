@@ -1,10 +1,10 @@
 import { useInfiniteScrollTop } from '6pp';
-import { AttachFile as AttachFileIcon, Send as SendIcon } from '@mui/icons-material';
-import EmojiIcon from '@mui/icons-material/EmojiEmotions';
-import EmojiOutline from '@mui/icons-material/EmojiEmotionsOutlined';
+import { AttachFile as AttachFileIcon, EmojiEmotions as EmojiIcon, EmojiEmotionsOutlined as EmojiOutline, Place as PlaceIcon, Send as SendIcon } from '@mui/icons-material';
 import { IconButton, Skeleton, Stack, Tooltip } from '@mui/material';
+import axios from 'axios';
 import Picker from 'emoji-picker-react';
 import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import FileMenu from '../components/dialogs/FileMenu';
@@ -15,10 +15,12 @@ import { grayColor, orange } from '../components/styles/color';
 import { InputBox } from '../components/styles/StyledComponents';
 import { ALERT, CHAT_JOINED, CHAT_LEAVED, MESSAGE_DELETE, NEW_MESSAGE, START_TYPING, STOP_TYPING } from '../constants/events';
 import { useAsyncMutation, useSocketEvents, useXErrors } from '../hooks/hook';
+import { getAddress } from '../lib/feature';
 import { useChatDetailsQuery, useDeleteMessageMutation, useGetMessagesQuery } from '../redux/apis/api';
 import { removeNewMessagesAlert } from '../redux/reducers/chat';
 import { setIsFileMenu, setShowEmojiPicker } from '../redux/reducers/misc';
 import { getSocket } from '../socket';
+import { GeoLocationConfig } from '../utils/config';
 
 const Chat = ({ chatId }) => {
   const socket = getSocket();
@@ -97,6 +99,22 @@ const Chat = ({ chatId }) => {
     if (e.key === 'Escape') dispatch(setShowEmojiPicker(!showEmojiPicker));
   }
 
+  const handleSendLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const { latitude, longitude } = position.coords;
+        const { data } = await axios.get(`https://reverse-geocoder.p.rapidapi.com/v1/getAddressByLocation?lat=${latitude}&lon=${longitude}&accept-language=en`, GeoLocationConfig);
+        const address = getAddress(data.address);
+        socket.emit(NEW_MESSAGE, { chatId, members, message: address });
+      },
+        (error) => {
+          console.log(error);
+        })
+    } else {
+      toast.info('Geolocation is not supported by Your browser.');
+    }
+  }
+
   useEffect(() => {
     socket.emit(CHAT_JOINED, { userId: user._id, members });
     dispatch(removeNewMessagesAlert(chatId));
@@ -145,7 +163,7 @@ const Chat = ({ chatId }) => {
   );
 
   const messageDeleteListener = useCallback(data => {
-    if(data.chatId !== chatId) return;
+    if (data.chatId !== chatId) return;
 
     setMessages((prev) => prev.filter((msg) => msg._id !== data.messageId));
     setOldMessages((prev) => prev.filter((msg) => msg._id !== data.messageId));
@@ -213,12 +231,20 @@ const Chat = ({ chatId }) => {
             </IconButton>
           </Tooltip>
 
+          {/* Type Chat Here */}
           <InputBox placeholder='Type Message Here...' value={message} onChange={messageOnChange} className='chatFont' sx={{ width: '100%', paddingLeft: '5px' }} autoFocus={showEmojiPicker} />
           <Tooltip title="Attach Files">
             <IconButton sx={{ rotate: '30deg', marginLeft: '.5rem' }} onClick={handleFileMenu}>
               <AttachFileIcon />
             </IconButton>
           </Tooltip>
+
+          <Tooltip title="Send Location">
+            <IconButton sx={{ marginLeft: '.5rem' }} onClick={handleSendLocation}>
+              <PlaceIcon />
+            </IconButton>
+          </Tooltip>
+
           <IconButton type='submit' disabled={!message.trim()} sx={{ bgcolor: orange, marginLeft: '.5rem', padding: '0.5rem', color: 'white', "&:hover": { bgcolor: 'error.dark' }, rotate: '-30deg' }}>
             <SendIcon />
           </IconButton>
